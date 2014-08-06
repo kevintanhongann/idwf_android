@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">IDWF</string>
+    <string name="siteUrl">http://localhost:8080/idwf</string>
+</resources>

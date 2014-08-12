@@ -41,7 +41,7 @@
                     android:maxLines="1"
                     android:singleLine="true"/>
 
-                <AutoCompleteTextView
+                <EditText
                     android:id="@+id/username"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

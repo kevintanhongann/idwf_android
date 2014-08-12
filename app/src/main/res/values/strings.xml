@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">IDWF</string>
     <string name="siteUrl">http://localhost:8080/idwf</string>
+    <string name="prompt_serverurl">Server URL</string>
 </resources>

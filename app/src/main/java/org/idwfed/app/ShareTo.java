@@ -3,8 +3,11 @@ package org.idwfed.app;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ParseException;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,8 +22,14 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -93,25 +102,56 @@ public class ShareTo extends Activity {
 
     public void doShare() {
         // Create a new HttpClient and Post Header
-        String serverurl = settings.getString("serverurl","");
-        Log.d("IDWF", "Login:" + serverurl);
-        /*HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost(serverurl);
+        class SendPostReqAsyncTask extends AsyncTask<String, Void, String> {
 
-        try {
-            // Add your data
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-            nameValuePairs.add(new BasicNameValuePair("id", "12345"));
-            nameValuePairs.add(new BasicNameValuePair("stringdata", "AndDev is Cool!"));
-            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+            @Override
+            protected String doInBackground(String... params) {
 
-            // Execute HTTP Post Request
-            HttpResponse response = httpclient.execute(httppost);
+                String serverurl = settings.getString("serverurl", "") + "/@@API/plone/api/1.0/create/abdzatry";
+                Log.d("IDWF", "Login:" + serverurl);
+                HttpClient httpclient = new DefaultHttpClient();
+                HttpPost httppost = new HttpPost(serverurl);
 
-        } catch (ClientProtocolException e) {
-            // TODO Auto-generated catch block
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-        }*/
+                String credentials = settings.getString("username", "") + ":" + settings.getString("password", "");
+                String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                httppost.addHeader("Authorization", "Basic " + base64EncodedCredentials);
+
+                try {
+                    JSONObject jsonobj = new JSONObject();
+                    jsonobj.put("title", "testing");
+                    jsonobj.put("description", "whoah");
+
+                    StringEntity se = new StringEntity(jsonobj.toString());
+                    se.setContentType("application/json;charset=UTF-8");
+                    se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json;charset=UTF-8"));
+
+                    httppost.setEntity(se);
+
+                    // Execute HTTP Post Request
+                    HttpResponse response = httpclient.execute(httppost);
+
+
+                    String responseText = null;
+                    try {
+                        responseText = EntityUtils.toString(response.getEntity());
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                        Log.i("Parse Exception", e + "");
+                    }
+
+                    JSONObject responsejson = new JSONObject(responseText);
+
+                } catch (ClientProtocolException e) {
+                    // TODO Auto-generated catch block
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        }
+        SendPostReqAsyncTask postreq = new SendPostReqAsyncTask();
+        postreq.execute();
     }
 }

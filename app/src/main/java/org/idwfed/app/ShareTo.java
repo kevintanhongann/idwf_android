@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,12 +29,15 @@ import java.util.List;
 
 public class ShareTo extends Activity {
 
+    public static final String PREFS_NAME = "IDWF";
+
     private SharedPreferences settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_share_to);
+        settings = getSharedPreferences(PREFS_NAME, 0);
         ImageView picView = (ImageView)findViewById(R.id.picture);
         TextView txtView = (TextView)findViewById(R.id.txt);
         Intent receivedIntent = getIntent();
@@ -62,7 +66,7 @@ public class ShareTo extends Activity {
         mShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onShare();
+                doShare();
             }
         });
     }
@@ -87,10 +91,12 @@ public class ShareTo extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void onShare() {
+    public void doShare() {
         // Create a new HttpClient and Post Header
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost(settings.getString("serverurl",""));
+        String serverurl = settings.getString("serverurl","");
+        Log.d("IDWF", "Login:" + serverurl);
+        /*HttpClient httpclient = new DefaultHttpClient();
+        HttpPost httppost = new HttpPost(serverurl);
 
         try {
             // Add your data
@@ -106,6 +112,6 @@ public class ShareTo extends Activity {
             // TODO Auto-generated catch block
         } catch (IOException e) {
             // TODO Auto-generated catch block
-        }
+        }*/
     }
 }

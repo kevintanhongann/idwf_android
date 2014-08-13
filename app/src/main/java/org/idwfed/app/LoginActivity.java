@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -146,10 +147,11 @@ public class LoginActivity extends Activity {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            settings.edit().putString("username", username);
-            settings.edit().putString("password",password);
-            settings.edit().putString("serverurl",serverurl);
-            
+            settings.edit().putString("username", username).commit();
+            settings.edit().putString("password",password).commit();
+            settings.edit().putString("serverurl",serverurl).commit();
+            Log.d("IDWF","username:" + settings.getString("username",""));
+
             Toast toast;
             toast = Toast.makeText(getApplicationContext(),
                     "Credentials Saved", Toast.LENGTH_SHORT);

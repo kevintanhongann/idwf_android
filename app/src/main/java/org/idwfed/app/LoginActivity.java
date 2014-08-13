@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -24,6 +25,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +36,10 @@ import java.util.List;
 
  */
 public class LoginActivity extends Activity {
+
+    public static final String PREFS_NAME = "IDWF";
+
+    private SharedPreferences settings;
 
     /**
      * A dummy authentication store containing known user names and passwords.
@@ -49,6 +56,7 @@ public class LoginActivity extends Activity {
     // UI references.
     private EditText mUsernameView;
     private EditText mPasswordView;
+    private EditText mServerUrl;
     private View mProgressView;
     private View mLoginFormView;
 
@@ -56,11 +64,20 @@ public class LoginActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        settings = getSharedPreferences(PREFS_NAME, 0);
+
 
         // Set up the login form.
         mUsernameView = (EditText) findViewById(R.id.username);
 
         mPasswordView = (EditText) findViewById(R.id.password);
+
+        mServerUrl = (EditText) findViewById(R.id.serverurl);
+
+        mUsernameView.setText(settings.getString("username",""));
+        mPasswordView.setText(settings.getString("password",""));
+        mServerUrl.setText(settings.getString("serverurl",""));
+
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -101,6 +118,7 @@ public class LoginActivity extends Activity {
         // Store values at the time of the login attempt.
         String username = mUsernameView.getText().toString();
         String password = mPasswordView.getText().toString();
+        String serverurl = mServerUrl.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -128,6 +146,14 @@ public class LoginActivity extends Activity {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
+            settings.edit().putString("username", username);
+            settings.edit().putString("password",password);
+            settings.edit().putString("serverurl",serverurl);
+            
+            Toast toast;
+            toast = Toast.makeText(getApplicationContext(),
+                    "Credentials Saved", Toast.LENGTH_SHORT);
+            toast.show();
             mAuthTask = new UserLoginTask(username, password);
             mAuthTask.execute((Void) null);
         }

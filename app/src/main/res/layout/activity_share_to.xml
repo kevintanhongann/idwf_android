@@ -1,12 +1,20 @@
-    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context=".ShareTo">
+
+    <TableLayout
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+        android:layout_weight="4">
 
         <TableRow
             android:layout_width="fill_parent"
@@ -22,7 +30,8 @@
             <EditText
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/titleTxt" />
+                android:id="@+id/titleTxt"
+                android:inputType="textMultiLine" />
         </TableRow>
 
         <TableRow
@@ -36,11 +45,6 @@
                 android:text="Description"
                 android:id="@+id/textView2" />
 
-            <ImageView
-                android:id="@+id/picture"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent" />
-
             <EditText
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -52,18 +56,41 @@
 
         <TableRow
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="fill_parent">
 
-            <Button
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Share"
-                android:id="@+id/sharebutton"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:enabled="true"
-                android:clickable="true"
-                android:layout_gravity="center_vertical" />
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Body"
+                android:id="@+id/textView3" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:ems="10"
+                android:id="@+id/bodyTxt" />
         </TableRow>
 
     </TableLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="68dp"
+        android:layout_gravity="center_horizontal">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Share"
+            android:id="@+id/sharebutton"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:enabled="true"
+            android:clickable="true"
+            android:layout_gravity="center_horizontal" />
+    </LinearLayout>
+</LinearLayout>
+

@@ -3,6 +3,7 @@ package org.idwfed.app;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.ParseException;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -16,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -47,33 +49,44 @@ public class ShareTo extends Activity {
 
     EditText txtView;
     EditText titleTxt;
-    ImageView picView;
+    EditText bodyTxt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_share_to);
         settings = getSharedPreferences(PREFS_NAME, 0);
-        picView = (ImageView)findViewById(R.id.picture);
         txtView = (EditText)findViewById(R.id.txt);
         titleTxt = (EditText)findViewById(R.id.titleTxt);
+        bodyTxt = (EditText)findViewById(R.id.bodyTxt);
         Intent receivedIntent = getIntent();
         String receivedAction = receivedIntent.getAction();
         String receivedType = receivedIntent.getType();
         if(receivedAction.equals(Intent.ACTION_SEND)){
             if(receivedType.startsWith("text/")){
-                picView.setVisibility(View.GONE);
                 String receivedText = receivedIntent.getStringExtra(Intent.EXTRA_TEXT);
                 if(receivedText!=null){
                     txtView.setText(receivedText);
                 }
-            }
-            else if(receivedType.startsWith("image/")){
-                txtView.setVisibility(View.GONE);
-                Uri receivedUri = (Uri)receivedIntent.getParcelableExtra(Intent.EXTRA_STREAM);
-                if(receivedUri!=null){
-                    picView.setImageURI(receivedUri);
+                String receivedSubject = receivedIntent.getStringExtra(Intent.EXTRA_SUBJECT);
+                if(receivedSubject!=null){
+                    titleTxt.setText(receivedSubject);
                 }
+
+                Bundle bundle = receivedIntent.getExtras();
+                for (String key : bundle.keySet()) {
+                    Object value = bundle.get(key);
+                    Log.d("IDWF - intent", String.format("%s %s (%s)", key,
+                            value.toString(), value.getClass().getName()));
+                }
+
+                //Log.d("IDWF - title",receivedIntent.getStringExtra(Intent.EXTRA_TITLE));
+                //Log.d("IDWF - template",receivedIntent.getStringExtra(Intent.EXTRA_TEMPLATE));
+                //Log.d("IDWF - html",receivedIntent.getStringExtra(Intent.EXTRA_HTML_TEXT));
+                //Log.d("IDWF - ori uri",receivedIntent.getStringExtra(Intent.EXTRA_ORIGINATING_URI));
+                //Log.d("IDWF - referrer",receivedIntent.getStringExtra(Intent.EXTRA_REFERRER));
+                //Log.d("IDWF - subject",receivedIntent.getStringExtra(Intent.EXTRA_SUBJECT));
+                //Log.d("IDWF - email",receivedIntent.getStringExtra(Intent.EXTRA_EMAIL));
             }
         }
         else if(receivedAction.equals(Intent.ACTION_MAIN)){
@@ -162,6 +175,7 @@ public class ShareTo extends Activity {
                     jsonobj.put("subjects","[]");
                     jsonobj.put("document_type","Letter");
                     jsonobj.put("document_owner","admin");
+                    jsonobj.put("text",bodyTxt.getText());
 
                     StringEntity se = new StringEntity(jsonobj.toString());
                     se.setContentType("application/json;charset=UTF-8");
@@ -184,6 +198,10 @@ public class ShareTo extends Activity {
 
                     Log.d("IDWF - response Text",responseText);
 
+                    /* Toast toast;
+                    toast = Toast.makeText(getApplicationContext(),
+                            "Item Shared", Toast.LENGTH_SHORT);
+                    toast.show(); */
 
                     /* String responseText = null;
                     try {

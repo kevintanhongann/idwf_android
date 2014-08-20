@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,6 +22,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -28,6 +30,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -42,13 +45,18 @@ public class ShareTo extends Activity {
 
     private SharedPreferences settings;
 
+    EditText txtView;
+    EditText titleTxt;
+    ImageView picView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_share_to);
         settings = getSharedPreferences(PREFS_NAME, 0);
-        ImageView picView = (ImageView)findViewById(R.id.picture);
-        TextView txtView = (TextView)findViewById(R.id.txt);
+        picView = (ImageView)findViewById(R.id.picture);
+        txtView = (EditText)findViewById(R.id.txt);
+        titleTxt = (EditText)findViewById(R.id.titleTxt);
         Intent receivedIntent = getIntent();
         String receivedAction = receivedIntent.getAction();
         String receivedType = receivedIntent.getType();
@@ -107,19 +115,53 @@ public class ShareTo extends Activity {
             @Override
             protected String doInBackground(String... params) {
 
-                String serverurl = settings.getString("serverurl", "") + "/@@API/plone/api/1.0/create/abdzatry";
-                Log.d("IDWF", "Login:" + serverurl);
                 HttpClient httpclient = new DefaultHttpClient();
+
+
+                String urlqueryid = settings.getString("serverurl", "") + "/@@API/plone/api/1.0/folders?q=idwfshared";
+                Log.d("IDWF - urlqueryid",urlqueryid);
+                HttpGet queryidpost = new HttpGet(urlqueryid);
+                String uid = "";
+                try {
+                    HttpResponse idresponse = httpclient.execute(queryidpost);
+                    String idresponsetext = null;
+                    try {
+                        idresponsetext = EntityUtils.toString(idresponse.getEntity());
+                        Log.d("IDWF - idresponse",idresponsetext);
+                        JSONObject idjson = new JSONObject(idresponsetext);
+                        JSONArray juid = idjson.getJSONArray("items");
+                        uid = juid.getJSONObject(0).getString("uid");
+                    }catch (ParseException e) {
+                        e.printStackTrace();
+                        Log.i("Parse Exception", e + "");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+                String serverurl = settings.getString("serverurl", "") + "/@@API/plone/api/1.0/documents/create/" + uid;
+                //String serverurl = settings.getString("serverurl", "");
+                Log.d("IDWF", "Login:" + serverurl);
                 HttpPost httppost = new HttpPost(serverurl);
+
 
                 String credentials = settings.getString("username", "") + ":" + settings.getString("password", "");
                 String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
                 httppost.addHeader("Authorization", "Basic " + base64EncodedCredentials);
-
                 try {
+
                     JSONObject jsonobj = new JSONObject();
-                    jsonobj.put("title", "testing");
-                    jsonobj.put("description", "whoah");
+
+                    jsonobj.put("title", titleTxt.getText());
+                    jsonobj.put("description", txtView.getText());
+                    jsonobj.put("effective","2001-05-11");
+                    jsonobj.put("expires","2015-12-11");
+                    jsonobj.put("subjects","[]");
+                    jsonobj.put("document_type","Letter");
+                    jsonobj.put("document_owner","admin");
 
                     StringEntity se = new StringEntity(jsonobj.toString());
                     se.setContentType("application/json;charset=UTF-8");
@@ -130,8 +172,20 @@ public class ShareTo extends Activity {
                     // Execute HTTP Post Request
                     HttpResponse response = httpclient.execute(httppost);
 
+                    Log.d("IDWF - response",response.toString());
 
                     String responseText = null;
+                    try {
+                        responseText = EntityUtils.toString(response.getEntity());
+                    }catch (ParseException e) {
+                        e.printStackTrace();
+                        Log.i("Parse Exception", e + "");
+                    }
+
+                    Log.d("IDWF - response Text",responseText);
+
+
+                    /* String responseText = null;
                     try {
                         responseText = EntityUtils.toString(response.getEntity());
                     } catch (ParseException e) {
@@ -139,7 +193,7 @@ public class ShareTo extends Activity {
                         Log.i("Parse Exception", e + "");
                     }
 
-                    JSONObject responsejson = new JSONObject(responseText);
+                    JSONObject responsejson = new JSONObject(responseText); */
 
                 } catch (ClientProtocolException e) {
                     // TODO Auto-generated catch block

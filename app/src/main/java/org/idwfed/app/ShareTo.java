@@ -62,7 +62,7 @@ public class ShareTo extends Activity {
         Intent receivedIntent = getIntent();
         String receivedAction = receivedIntent.getAction();
         String receivedType = receivedIntent.getType();
-        if(receivedAction.equals(Intent.ACTION_SEND)){
+        if(receivedAction!=null && receivedAction.equals(Intent.ACTION_SEND)){
             if(receivedType.startsWith("text/")){
                 String receivedText = receivedIntent.getStringExtra(Intent.EXTRA_TEXT);
                 if(receivedText!=null){
@@ -124,6 +124,15 @@ public class ShareTo extends Activity {
     public void doShare() {
         // Create a new HttpClient and Post Header
         class SendPostReqAsyncTask extends AsyncTask<String, Void, String> {
+
+            @Override
+            protected void onPostExecute(String status){
+                Toast toast;
+                toast = Toast.makeText(getApplicationContext(),
+                        status, Toast.LENGTH_SHORT);
+                toast.show();
+                finish();
+            }
 
             @Override
             protected String doInBackground(String... params) {
@@ -220,7 +229,7 @@ public class ShareTo extends Activity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                return null;
+                return "Successfully shared item";
             }
         }
         SendPostReqAsyncTask postreq = new SendPostReqAsyncTask();

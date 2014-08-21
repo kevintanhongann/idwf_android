@@ -7,6 +7,7 @@
         <item name="android:actionBarStyle">@style/MyActionBar</item>
         <item name="android:actionBarTabTextStyle">@style/MyActionBarTabText</item>
         <item name="android:actionMenuTextColor">#00FF00</item>
+        <item name="android:fontFamily">Ro</item>
     </style>
 
     <!-- ActionBar styles -->

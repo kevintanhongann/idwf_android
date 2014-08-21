@@ -81,13 +81,6 @@ public class ShareTo extends Activity {
                             value.toString(), value.getClass().getName()));
                 }
 
-                //Log.d("IDWF - title",receivedIntent.getStringExtra(Intent.EXTRA_TITLE));
-                //Log.d("IDWF - template",receivedIntent.getStringExtra(Intent.EXTRA_TEMPLATE));
-                //Log.d("IDWF - html",receivedIntent.getStringExtra(Intent.EXTRA_HTML_TEXT));
-                //Log.d("IDWF - ori uri",receivedIntent.getStringExtra(Intent.EXTRA_ORIGINATING_URI));
-                //Log.d("IDWF - referrer",receivedIntent.getStringExtra(Intent.EXTRA_REFERRER));
-                //Log.d("IDWF - subject",receivedIntent.getStringExtra(Intent.EXTRA_SUBJECT));
-                //Log.d("IDWF - email",receivedIntent.getStringExtra(Intent.EXTRA_EMAIL));
             }
         }
         else if(receivedAction.equals(Intent.ACTION_MAIN)){
@@ -121,21 +114,29 @@ public class ShareTo extends Activity {
 
     public void doShare() {
         // Create a new HttpClient and Post Header
-        class SendPostReqAsyncTask extends AsyncTask<String, Void, String> {
+        class SendPostReqAsyncTask extends AsyncTask<String, Void, Boolean> {
 
-            @Override
-            protected void onPostExecute(String status){
+            protected void onPostExecute(Boolean status){
+                String message = "";
+                if(status){
+                    message = "Item successfully shared";
+                }
+                else{
+                    message = "Failed to share item";
+                }
                 Toast toast;
                 toast = Toast.makeText(getApplicationContext(),
-                        status, Toast.LENGTH_SHORT);
+                        message, Toast.LENGTH_SHORT);
                 toast.show();
-                finish();
+                if(status) {
+                    finish();
+                }
             }
 
-            @Override
-            protected String doInBackground(String... params) {
+            protected Boolean doInBackground(String... params) {
 
                 HttpClient httpclient = new DefaultHttpClient();
+                Boolean success = false;
 
 
                 String urlqueryid = settings.getString("serverurl", "") + "/@@API/plone/api/1.0/folders?q=idwfshared";
@@ -198,6 +199,13 @@ public class ShareTo extends Activity {
                     String responseText = null;
                     try {
                         responseText = EntityUtils.toString(response.getEntity());
+                        JSONObject respjson = new JSONObject(responseText);
+                        Integer count = respjson.getInt("count");
+                        if(count>0){
+                            success=true;
+                        }
+                        Log.d("IDWF - succcess",success.toString());
+
                     }catch (ParseException e) {
                         e.printStackTrace();
                         Log.i("Parse Exception", e + "");
@@ -205,20 +213,6 @@ public class ShareTo extends Activity {
 
                     Log.d("IDWF - response Text",responseText);
 
-                    /* Toast toast;
-                    toast = Toast.makeText(getApplicationContext(),
-                            "Item Shared", Toast.LENGTH_SHORT);
-                    toast.show(); */
-
-                    /* String responseText = null;
-                    try {
-                        responseText = EntityUtils.toString(response.getEntity());
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                        Log.i("Parse Exception", e + "");
-                    }
-
-                    JSONObject responsejson = new JSONObject(responseText); */
 
                 } catch (ClientProtocolException e) {
                     // TODO Auto-generated catch block
@@ -227,7 +221,7 @@ public class ShareTo extends Activity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                return "Successfully shared item";
+                return success;
             }
         }
         SendPostReqAsyncTask postreq = new SendPostReqAsyncTask();

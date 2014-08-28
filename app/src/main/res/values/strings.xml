@@ -1,8 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">IDWF</string>
     <string name="siteUrl">http://localhost:8080/idwf</string>
     <string name="action_settings">Settings</string>
     <string name="prompt_serverurl">Server URL</string>
     <string name="savecredentials">Save Credentials</string>
     <string name="send_now">Send Now</string>
+    <string name="title_activity_shared_list">IDWF Shared List</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="refresh">Refresh</string>
+
 </resources>

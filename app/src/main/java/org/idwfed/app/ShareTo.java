@@ -9,6 +9,7 @@ import android.net.ParseException;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
@@ -50,6 +51,7 @@ public class ShareTo extends Activity {
     public static final String PREFS_NAME = "IDWF";
 
     private static final int SELECT_PHOTO = 100;
+    private static final int CAPTURE_PHOTO = 101;
 
     private SharedPreferences settings;
 
@@ -120,6 +122,12 @@ public class ShareTo extends Activity {
                 photoPickerIntent.setType("image/*");
                 startActivityForResult(photoPickerIntent, SELECT_PHOTO);
                 return true;
+            case R.id.action_camera:
+                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (cameraIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(cameraIntent, CAPTURE_PHOTO);
+                }
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -168,6 +176,12 @@ public class ShareTo extends Activity {
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
+                }
+            case CAPTURE_PHOTO:
+                if(resultCode == RESULT_OK){
+                    Bundle extras = imageReturnedIntent.getExtras();
+                    Bitmap imageBitmap = (Bitmap) extras.get("data");
+                    imageView.setImageBitmap(imageBitmap);
                 }
         }
     }

@@ -12,5 +12,6 @@
     <string name="refresh">Refresh</string>
     <string name="newshare">New Share</string>
     <string name="pick_gallery">Pick From Gallery</string>
+    <string name="shoot_picture">Shoot Picture</string>
 
 </resources>

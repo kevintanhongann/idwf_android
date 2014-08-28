@@ -63,28 +63,29 @@ public class ShareTo extends Activity {
         Intent receivedIntent = getIntent();
         String receivedAction = receivedIntent.getAction();
         String receivedType = receivedIntent.getType();
-        if(receivedAction!=null && receivedAction.equals(Intent.ACTION_SEND)){
-            if(receivedType.startsWith("text/")){
-                String receivedText = receivedIntent.getStringExtra(Intent.EXTRA_TEXT);
-                if(receivedText!=null){
-                    txtView.setText(receivedText);
-                }
-                String receivedSubject = receivedIntent.getStringExtra(Intent.EXTRA_SUBJECT);
-                if(receivedSubject!=null){
-                    titleTxt.setText(receivedSubject);
-                }
+        if(receivedAction!=null) {
+            if (receivedAction.equals(Intent.ACTION_SEND)) {
+                if (receivedType.startsWith("text/")) {
+                    String receivedText = receivedIntent.getStringExtra(Intent.EXTRA_TEXT);
+                    if (receivedText != null) {
+                        txtView.setText(receivedText);
+                    }
+                    String receivedSubject = receivedIntent.getStringExtra(Intent.EXTRA_SUBJECT);
+                    if (receivedSubject != null) {
+                        titleTxt.setText(receivedSubject);
+                    }
 
-                Bundle bundle = receivedIntent.getExtras();
-                for (String key : bundle.keySet()) {
-                    Object value = bundle.get(key);
-                    Log.d("IDWF - intent", String.format("%s %s (%s)", key,
-                            value.toString(), value.getClass().getName()));
-                }
+                    Bundle bundle = receivedIntent.getExtras();
+                    for (String key : bundle.keySet()) {
+                        Object value = bundle.get(key);
+                        Log.d("IDWF - intent", String.format("%s %s (%s)", key,
+                                value.toString(), value.getClass().getName()));
+                    }
 
+                }
+            } else if (receivedAction.equals(Intent.ACTION_MAIN)) {
+                txtView.setText("Nothing has been shared");
             }
-        }
-        else if(receivedAction.equals(Intent.ACTION_MAIN)){
-            txtView.setText("Nothing has been shared");
         }
     }
 

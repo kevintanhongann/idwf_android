@@ -10,5 +10,6 @@
     <string name="title_activity_shared_list">IDWF Shared List</string>
     <string name="hello_world">Hello world!</string>
     <string name="refresh">Refresh</string>
+    <string name="newshare">New Share</string>
 
 </resources>

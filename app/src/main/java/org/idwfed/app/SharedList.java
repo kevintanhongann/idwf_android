@@ -82,6 +82,11 @@ public class SharedList extends Activity {
             startActivity(settingactivity);
             return true;
         }
+        else if (id == R.id.action_new) {
+            Intent newshare = new Intent(this,ShareTo.class);
+            startActivity(newshare);
+            return true;
+        }
         else if(id == R.id.action_refresh) {
             FragmentManager fmanager = getFragmentManager();
             SharedListFragment slf = (SharedListFragment) fmanager.findFragmentById(R.id.container);

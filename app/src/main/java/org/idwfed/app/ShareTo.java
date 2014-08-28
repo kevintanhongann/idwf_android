@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ParseException;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -37,7 +38,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,11 +49,14 @@ public class ShareTo extends Activity {
 
     public static final String PREFS_NAME = "IDWF";
 
+    private static final int SELECT_PHOTO = 100;
+
     private SharedPreferences settings;
 
     EditText txtView;
     EditText titleTxt;
     EditText bodyTxt;
+    ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +66,7 @@ public class ShareTo extends Activity {
         txtView = (EditText)findViewById(R.id.txt);
         titleTxt = (EditText)findViewById(R.id.titleTxt);
         bodyTxt = (EditText)findViewById(R.id.bodyTxt);
+        imageView = (ImageView)findViewById(R.id.imageView);
         Intent receivedIntent = getIntent();
         String receivedAction = receivedIntent.getAction();
         String receivedType = receivedIntent.getType();
@@ -108,8 +115,60 @@ public class ShareTo extends Activity {
             case R.id.action_send_now:
                 doShare();
                 return true;
+            case R.id.action_pick_gallery:
+                Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                photoPickerIntent.setType("image/*");
+                startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private Bitmap decodeUri(Uri selectedImage) throws FileNotFoundException {
+
+        // Decode image size
+        BitmapFactory.Options o = new BitmapFactory.Options();
+        o.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImage), null, o);
+
+        // The new size we want to scale to
+        final int REQUIRED_SIZE = 140;
+
+        // Find the correct scale value. It should be the power of 2.
+        int width_tmp = o.outWidth, height_tmp = o.outHeight;
+        int scale = 1;
+        while (true) {
+            if (width_tmp / 2 < REQUIRED_SIZE
+                    || height_tmp / 2 < REQUIRED_SIZE) {
+                break;
+            }
+            width_tmp /= 2;
+            height_tmp /= 2;
+            scale *= 2;
+        }
+
+        // Decode with inSampleSize
+        BitmapFactory.Options o2 = new BitmapFactory.Options();
+        o2.inSampleSize = scale;
+        return BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImage), null, o2);
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+
+        switch(requestCode) {
+            case SELECT_PHOTO:
+                if(resultCode == RESULT_OK){
+                    Uri selectedImage = imageReturnedIntent.getData();
+                    try {
+                        imageView.setImageBitmap(decodeUri(selectedImage));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
         }
     }
 

@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/action_pick_gallery"
+        android:icon="@drawable/ic_action_new_picture"
+        android:showAsAction="ifRoom"
+        android:title="@string/pick_gallery"
+        android:visible="true"/>
     <item android:id="@+id/action_send_now"
         android:icon="@drawable/ic_action_send_now"
         android:showAsAction="ifRoom"

@@ -31,7 +31,8 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/titleTxt"
-                android:inputType="textMultiLine" />
+                android:inputType="textMultiLine"
+                style="@android:style/Widget.DeviceDefault.Light.TextView" />
         </TableRow>
 
         <TableRow
@@ -88,6 +89,23 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/imageView" />
+        </TableRow>
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Country"
+                android:id="@+id/textView5" />
+
+             <Spinner
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/country"
+                 style="@android:style/TextAppearance.Holo.Widget.ActionMode.Subtitle" />
         </TableRow>
 
     </TableLayout>

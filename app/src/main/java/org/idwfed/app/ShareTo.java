@@ -16,9 +16,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,6 +61,9 @@ public class ShareTo extends Activity {
     EditText titleTxt;
     EditText bodyTxt;
     ImageView imageView;
+    Spinner countrySpin;
+
+    List<String> countries = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +74,18 @@ public class ShareTo extends Activity {
         titleTxt = (EditText)findViewById(R.id.titleTxt);
         bodyTxt = (EditText)findViewById(R.id.bodyTxt);
         imageView = (ImageView)findViewById(R.id.imageView);
+
+        countries.add("Malaysia");
+        countries.add("Indonesia");
+
+        countrySpin = (Spinner) findViewById(R.id.country);
+// Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),android.R.layout.simple_spinner_item,countries);
+// Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+// Apply the adapter to the spinner
+        countrySpin.setAdapter(adapter);
+
         Intent receivedIntent = getIntent();
         String receivedAction = receivedIntent.getAction();
         String receivedType = receivedIntent.getType();
@@ -177,12 +194,14 @@ public class ShareTo extends Activity {
                         e.printStackTrace();
                     }
                 }
+                return;
             case CAPTURE_PHOTO:
                 if(resultCode == RESULT_OK){
                     Bundle extras = imageReturnedIntent.getExtras();
                     Bitmap imageBitmap = (Bitmap) extras.get("data");
                     imageView.setImageBitmap(imageBitmap);
                 }
+                return;
         }
     }
 

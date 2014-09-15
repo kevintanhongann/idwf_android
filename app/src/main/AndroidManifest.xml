@@ -26,7 +26,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SharedList"
+            android:name=".SharedListActivity"
             android:label="@string/title_activity_shared_list" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

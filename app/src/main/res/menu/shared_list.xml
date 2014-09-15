@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="org.idwfed.app.SharedList" >
+    tools:context="org.idwfed.app.SharedListActivity" >
     <item android:id="@+id/action_new"
         android:icon="@drawable/ic_action_new"
         android:showAsAction="ifRoom"

@@ -16,8 +16,11 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import org.idwfed.app.callback.LoginCallback;
+import org.idwfed.app.callback.PublicDocumentsCallback;
 import org.idwfed.app.exception.LoginException;
+import org.idwfed.app.exception.PublicDocumentsException;
 import org.idwfed.app.response.LoginResponse;
+import org.idwfed.app.response.PublicDocumentsResponse;
 import org.idwfed.app.util.Consts;
 import org.json.JSONObject;
 
@@ -92,8 +95,38 @@ public enum IDWFApiImpl implements IDWFApi {
     }
 
     @Override
-    public void getPublicDocuments(Context context) {
+    public void getPublicDocuments(Context context, final PublicDocumentsCallback callback) {
+        String url = "http://storyapi.dev.inigo-tech.com/@@API/plone/api/1.0/documents";
 
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.d(Consts.LOGTAG,
+                        "getPublicDocuments response " + response.toString());
+                //parse response object to json
+                Type type = new TypeToken<PublicDocumentsResponse>() {
+                }.getType();
+                Gson gson = new GsonBuilder().serializeNulls().create();
+                PublicDocumentsResponse publicDocumentsResponse = gson
+                        .fromJson(response.toString(), type);
+                Log.d(Consts.LOGTAG,
+                        "publicDocumentsResponse " + publicDocumentsResponse);
+                callback.onSuccess(publicDocumentsResponse);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if(error instanceof TimeoutError){
+                    callback.onFail(new PublicDocumentsException("Request timeout", error));
+                }else if(error instanceof NoConnectionError){
+                    callback.onFail(new PublicDocumentsException("No connection", error));
+                }else{
+                    callback.onFail(new PublicDocumentsException(error.getMessage(), error));
+                }
+            }
+        });
+
+        getRequestQueue(context).add(request);
     }
 
 

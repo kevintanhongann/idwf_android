@@ -19,4 +19,13 @@ public class PrefUtils {
     public String getUsername(Context context){
         return getPreferences(context).getString("idwf.app.username", "");
     }
+
+    public void setServerUrl(Context context, String serverUrl){
+        getPreferences(context).edit().putString("idwf.app.serverurl", serverUrl).commit();
+    }
+
+    public String getServerUrl(Context context){
+        return getPreferences(context).getString("idwf.app.serverurl", "");
+    }
+
 }

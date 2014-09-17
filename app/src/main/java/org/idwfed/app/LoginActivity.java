@@ -16,6 +16,7 @@ import org.idwfed.app.callback.LoginCallback;
 import org.idwfed.app.exception.LoginException;
 import org.idwfed.app.response.LoginResponse;
 
+import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 
@@ -23,17 +24,6 @@ import butterknife.InjectView;
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends Activity {
-
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world", "admin:admin"
-    };
-
-    // UI references.
-
 
     @InjectView(R.id.editText_username)
     EditText tvUsername;
@@ -67,7 +57,9 @@ public class LoginActivity extends Activity {
 
                     @Override
                     public void onSuccess(LoginResponse response) {
+                        if (response != null) {
 
+                        }
                     }
                 });
             }
@@ -78,6 +70,7 @@ public class LoginActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        ButterKnife.inject(this);
         idwfApi = ApiFactory.INSTANCE.getIDWFApi();
         mEmailSignInButton.setOnClickListener(onSignInClick);
     }

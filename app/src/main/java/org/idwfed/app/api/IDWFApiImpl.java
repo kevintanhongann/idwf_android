@@ -15,13 +15,17 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
+import org.idwfed.app.callback.CreateWccDocumentCallback;
 import org.idwfed.app.callback.LoginCallback;
 import org.idwfed.app.callback.PublicDocumentsCallback;
+import org.idwfed.app.exception.CreateWccDocException;
 import org.idwfed.app.exception.LoginException;
 import org.idwfed.app.exception.PublicDocumentsException;
 import org.idwfed.app.response.LoginResponse;
+import org.idwfed.app.response.CreateWccDocResponse;
 import org.idwfed.app.response.PublicDocumentsResponse;
 import org.idwfed.app.util.Consts;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Type;
@@ -37,7 +41,50 @@ public enum IDWFApiImpl implements IDWFApi {
 
 
     @Override
-    public void createWccDoc(String documentId) {
+    public void createWccDoc(Context context, String title, String description, String body, String country, String url, final CreateWccDocumentCallback callback) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("title", title);
+            jsonObject.put("description", description);
+            jsonObject.put("effective", "2001-05-11");
+            jsonObject.put("expires", "2015-12-11");
+            jsonObject.put("subjects", "[]");
+            jsonObject.put("document_type", "Letter");
+            jsonObject.put("document_owner", "admin");
+            jsonObject.put("text", body);
+
+
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObject, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    Log.d(Consts.LOGTAG,
+                            "createWccDoc response " + response.toString());
+                    //parse response object to json
+                    Type type = new TypeToken<CreateWccDocResponse>() {
+                    }.getType();
+                    Gson gson = new GsonBuilder().serializeNulls().create();
+                    CreateWccDocResponse createWccDocResponse = gson
+                            .fromJson(response.toString(), type);
+                    Log.d(Consts.LOGTAG,
+                            "createWccDocResponse " + createWccDocResponse);
+                    callback.onSuccess(createWccDocResponse);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    if (error instanceof TimeoutError) {
+                        callback.onFail(new CreateWccDocException("Request timeout", error));
+                    } else if (error instanceof NoConnectionError) {
+                        callback.onFail(new CreateWccDocException("No connection", error));
+                    } else {
+                        callback.onFail(new CreateWccDocException(error.getMessage(), error));
+                    }
+                }
+            });
+            getRequestQueue(context).add(request);
+        } catch (JSONException e) {
+            callback.onFail(new CreateWccDocException(e.getMessage(), e));
+        }
 
     }
 
@@ -68,11 +115,11 @@ public enum IDWFApiImpl implements IDWFApi {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                if(error instanceof TimeoutError){
+                if (error instanceof TimeoutError) {
                     callback.onFail(new LoginException("Request timeout", error));
-                }else if(error instanceof NoConnectionError){
+                } else if (error instanceof NoConnectionError) {
                     callback.onFail(new LoginException("No connnection", error));
-                }else{
+                } else {
                     callback.onFail(new LoginException(error.getMessage(), error));
                 }
             }
@@ -116,11 +163,11 @@ public enum IDWFApiImpl implements IDWFApi {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                if(error instanceof TimeoutError){
+                if (error instanceof TimeoutError) {
                     callback.onFail(new PublicDocumentsException("Request timeout", error));
-                }else if(error instanceof NoConnectionError){
+                } else if (error instanceof NoConnectionError) {
                     callback.onFail(new PublicDocumentsException("No connection", error));
-                }else{
+                } else {
                     callback.onFail(new PublicDocumentsException(error.getMessage(), error));
                 }
             }

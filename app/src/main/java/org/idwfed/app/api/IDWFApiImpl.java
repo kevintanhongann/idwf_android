@@ -62,7 +62,7 @@ public enum IDWFApiImpl implements IDWFApi {
                     //parse response object to json
                     Type type = new TypeToken<CreateWccDocResponse>() {
                     }.getType();
-                    Gson gson = new GsonBuilder().serializeNulls().create();
+                    Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZ").serializeNulls().create();
                     CreateWccDocResponse createWccDocResponse = gson
                             .fromJson(response.toString(), type);
                     Log.d(Consts.LOGTAG,
@@ -109,17 +109,7 @@ public enum IDWFApiImpl implements IDWFApi {
         }, new Response.Listener<LoginResponse>() {
             @Override
             public void onResponse(LoginResponse response) {
-                Log.d(Consts.LOGTAG,
-                        "loginResponse " + response.toString());
-                //parse response object to json
-                Type type = new TypeToken<LoginResponse>() {
-                }.getType();
-                Gson gson = new GsonBuilder().serializeNulls().create();
-                LoginResponse loginResponse = gson
-                        .fromJson(response.toString(), type);
-                Log.d(Consts.LOGTAG,
-                        "loginResponse " + loginResponse);
-                callback.onSuccess(loginResponse);
+                callback.onSuccess(response);
             }
         });
 
@@ -151,7 +141,7 @@ public enum IDWFApiImpl implements IDWFApi {
                 //parse response object to json
                 Type type = new TypeToken<PublicDocumentsResponse>() {
                 }.getType();
-                Gson gson = new GsonBuilder().serializeNulls().create();
+                Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZ").serializeNulls().create();
                 PublicDocumentsResponse publicDocumentsResponse = gson
                         .fromJson(response.toString(), type);
                 Log.d(Consts.LOGTAG,

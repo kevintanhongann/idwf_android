@@ -9,25 +9,29 @@ import org.idwfed.app.domain.Item;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class LoginResponse {
 
-    @Expose
-    private String url;
+    /*@Expose
+    private String url;*/
+
     @Expose
     private Integer count;
+
     @SerializedName("_runtime")
     @Expose
     private Double runtime;
+
     @Expose
     private List<Item> items = new ArrayList<Item>();
 
-    public String getUrl() {
+    /*public String getUrl() {
         return url;
     }
 
     public void setUrl(String url) {
         this.url = url;
-    }
+    }*/
 
     public Integer getCount() {
         return count;
@@ -56,12 +60,10 @@ public class LoginResponse {
     @Override
     public String toString() {
         return "LoginResponse{" +
-                "url='" + url + '\'' +
+                //"url='" + url + '\'' +
                 ", count=" + count +
                 ", runtime=" + runtime +
                 ", items=" + items +
                 '}';
     }
-
-
 }

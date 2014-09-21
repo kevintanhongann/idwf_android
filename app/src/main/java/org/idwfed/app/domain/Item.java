@@ -1,8 +1,10 @@
 package org.idwfed.app.domain;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -12,22 +14,37 @@ public class Item {
 
     @SerializedName("api_url")
     private String apiUrl;
-    private String effective;
-    private List<Object> tags = new ArrayList<Object>();
+
+    @SerializedName("effective")
+    private Date effective;
+
     private String url;
+
+    @Expose
+    private List<String> tags = new ArrayList<String>();
 
     @SerializedName("portal_type")
     private String portalType;
+
     private String description;
 
-    private String modified;
+    @SerializedName("modified")
+    private Date modified;
 
-    private String created;
+    @SerializedName("created")
+    private Date created;
 
     private String title;
+
     private String type;
+
     private String id;
+
     private String uid;
+
+    public List<String> getTags() {
+        return tags;
+    }
 
     public String getApiUrl() {
         return apiUrl;
@@ -37,21 +54,14 @@ public class Item {
         this.apiUrl = apiUrl;
     }
 
-    public String getEffective() {
+    public Date getEffective() {
         return effective;
     }
 
-    public void setEffective(String effective) {
+    public void setEffective(Date effective) {
         this.effective = effective;
     }
 
-    public List<Object> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Object> tags) {
-        this.tags = tags;
-    }
 
     public String getUrl() {
         return url;
@@ -77,19 +87,19 @@ public class Item {
         this.description = description;
     }
 
-    public String getModified() {
+    public Date getModified() {
         return modified;
     }
 
-    public void setModified(String modified) {
+    public void setModified(Date modified) {
         this.modified = modified;
     }
 
-    public String getCreated() {
+    public Date getCreated() {
         return created;
     }
 
-    public void setCreated(String created) {
+    public void setCreated(Date created) {
         this.created = created;
     }
 
@@ -129,13 +139,13 @@ public class Item {
     public String toString() {
         return "Item{" +
                 "apiUrl='" + apiUrl + '\'' +
-                ", effective='" + effective + '\'' +
-                ", tags=" + tags +
+                ", effective=" + effective +
                 ", url='" + url + '\'' +
+                ", tags=" + tags +
                 ", portalType='" + portalType + '\'' +
                 ", description='" + description + '\'' +
-                ", modified='" + modified + '\'' +
-                ", created='" + created + '\'' +
+                ", modified=" + modified +
+                ", created=" + created +
                 ", title='" + title + '\'' +
                 ", type='" + type + '\'' +
                 ", id='" + id + '\'' +

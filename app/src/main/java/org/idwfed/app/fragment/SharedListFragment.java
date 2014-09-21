@@ -73,20 +73,7 @@ public class SharedListFragment extends ListFragment {
                     ItemsAdapter itemsAdapter = new ItemsAdapter(getActivity().getApplicationContext(), R.layout.layout_doc_row, response.getItems());
                     LoginSuccessEvent loginSuccessEvent = EventBus.getDefault().getStickyEvent(LoginSuccessEvent.class);
                     if (loginSuccessEvent != null) {
-                        for (LoginResponse.Item item : loginSuccessEvent.getItems()) {
-                            /*Item docItem = new Item();
-                            docItem.setApiUrl(item.getApiUrl());
-                            docItem.setCreated(item.getCreated());
-                            docItem.setDescription(item.getDescription());
-                            docItem.setEffective(item.getEffective());
-                            docItem.setId(item.getId());
-                            docItem.setPortalType(item.getPortalType());
-                            docItem.setTags(item.getTags());
-                            docItem.setTitle(item.getTitle());
-                            docItem.setUid(item.getUid());
-                            docItem.setType(item.getType());
-                            itemsAdapter.add(docItem);*/
-                        }
+
                     }
                     getListView().setAdapter(itemsAdapter);
                     getListView().setOnItemClickListener(onItemClick);
@@ -115,7 +102,7 @@ public class SharedListFragment extends ListFragment {
             }
             viewHolder = (ViewHolder) view.getTag();
             viewHolder.tvTitle.setText(getItem(position).getTitle());
-            viewHolder.tvDateCreated.setText(getItem(position).getCreated());
+            viewHolder.tvDateCreated.setText(getItem(position).getCreated().toString());
             return view;
         }
     }

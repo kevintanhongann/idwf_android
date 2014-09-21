@@ -1,6 +1,5 @@
 package org.idwfed.app.domain;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
@@ -12,30 +11,22 @@ import java.util.List;
 public class Item {
 
     @SerializedName("api_url")
-    @Expose
     private String apiUrl;
-    @Expose
     private String effective;
-    @Expose
     private List<Object> tags = new ArrayList<Object>();
-    @Expose
     private String url;
+
     @SerializedName("portal_type")
-    @Expose
     private String portalType;
-    @Expose
     private String description;
-    @Expose
+
     private String modified;
-    @Expose
+
     private String created;
-    @Expose
+
     private String title;
-    @Expose
     private String type;
-    @Expose
     private String id;
-    @Expose
     private String uid;
 
     public String getApiUrl() {

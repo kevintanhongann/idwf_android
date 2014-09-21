@@ -1,32 +1,13 @@
 package org.idwfed.app;
 
 import android.app.Activity;
-import android.app.FragmentManager;
-import android.app.ListFragment;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import org.idwfed.app.api.ApiFactory;
-import org.idwfed.app.api.IDWFApi;
-import org.idwfed.app.callback.PublicDocumentsCallback;
-import org.idwfed.app.domain.Item;
-import org.idwfed.app.exception.PublicDocumentsException;
 import org.idwfed.app.fragment.SharedListFragment;
-import org.idwfed.app.response.PublicDocumentsResponse;
-
-import java.util.List;
-
-import butterknife.ButterKnife;
-import butterknife.InjectView;
+import org.idwfed.app.util.PrefUtils;
 
 
 public class SharedListActivity extends Activity {
@@ -61,11 +42,18 @@ public class SharedListActivity extends Activity {
             startActivity(settingactivity);
             return true;
         } else if (id == R.id.action_new) {
-            Intent newshare = new Intent(this, ShareTo.class);
-            startActivity(newshare);
-            return true;
+            if (!PrefUtils.getUsername(this).isEmpty() && !PrefUtils.getPassword(this).isEmpty()) {
+                Intent newshare = new Intent(this, PublishDocumentActivity.class);
+                startActivity(newshare);
+                return true;
+            } else {
+                Intent loginIntent = new Intent(this, LoginActivity.class);
+                startActivity(loginIntent);
+            }
         } else if (id == R.id.action_refresh) {
-
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.container, new SharedListFragment())
+                    .commit();
         }
         return super.onOptionsItemSelected(item);
     }

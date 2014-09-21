@@ -1,6 +1,4 @@
-
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="fill_parent"
@@ -12,9 +10,9 @@
     tools:context=".ShareTo">
 
     <TableLayout
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-        android:layout_weight="4">
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <TableRow
             android:layout_width="fill_parent"
@@ -30,7 +28,7 @@
             <EditText
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/titleTxt"
+                android:id="@+id/editText_titleTxt"
                 android:inputType="textMultiLine"
                 style="@android:style/Widget.DeviceDefault.Light.TextView" />
         </TableRow>
@@ -51,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="textMultiLine"
                 android:ems="10"
-                android:id="@+id/txt" />
+                android:id="@+id/editText_description" />
 
         </TableRow>
 
@@ -71,7 +69,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="textMultiLine"
                 android:ems="10"
-                android:id="@+id/bodyTxt" />
+                android:id="@+id/editText_bodyTxt" />
         </TableRow>
 
         <TableRow
@@ -90,6 +88,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/imageView" />
         </TableRow>
+
         <TableRow
             android:layout_width="fill_parent"
             android:layout_height="fill_parent">
@@ -101,14 +100,20 @@
                 android:text="Country"
                 android:id="@+id/textView5" />
 
-             <Spinner
-                android:layout_width="wrap_content"
+            <Spinner
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/country"
-                 style="@android:style/TextAppearance.Holo.Widget.ActionMode.Subtitle" />
+                android:id="@+id/spinner_country"
+                style="@android:style/TextAppearance.Holo.Widget.ActionMode.Subtitle" />
         </TableRow>
 
     </TableLayout>
+
+    <Button
+        android:id="@+id/button_submit"
+        android:text="Submit Document"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>
 

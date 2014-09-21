@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="server_url"></string>
-
+    <string name="server_url">http://storyapi.dev.inigo-tech.com</string>
+    <string name="server_path">/@@API/plone/api/1.0/folders?q=idwfshared</string>
+    <string name="login_path">/@@API/plone/api/1.0/documents</string>
 </resources>

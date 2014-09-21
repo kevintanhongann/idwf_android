@@ -21,6 +21,7 @@ import org.idwfed.app.callback.PublicDocumentsCallback;
 import org.idwfed.app.exception.CreateWccDocException;
 import org.idwfed.app.exception.LoginException;
 import org.idwfed.app.exception.PublicDocumentsException;
+import org.idwfed.app.request.LoginRequest;
 import org.idwfed.app.response.LoginResponse;
 import org.idwfed.app.response.CreateWccDocResponse;
 import org.idwfed.app.response.PublicDocumentsResponse;
@@ -52,7 +53,6 @@ public enum IDWFApiImpl implements IDWFApi {
             jsonObject.put("document_type", "Letter");
             jsonObject.put("document_owner", "admin");
             jsonObject.put("text", body);
-
 
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObject, new Response.Listener<JSONObject>() {
                 @Override
@@ -95,24 +95,7 @@ public enum IDWFApiImpl implements IDWFApi {
 
     @Override
     public void login(Context context, String username, String password, String url, final LoginCallback callback) {
-        JSONObject jsonObject = new JSONObject();
-
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObject, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                Log.d(Consts.LOGTAG,
-                        "login response " + response.toString());
-                //parse response object to json
-                Type type = new TypeToken<LoginResponse>() {
-                }.getType();
-                Gson gson = new GsonBuilder().serializeNulls().create();
-                LoginResponse loginResponse = gson
-                        .fromJson(response.toString(), type);
-                Log.d(Consts.LOGTAG,
-                        "loginResponse " + loginResponse);
-                callback.onSuccess(loginResponse);
-            }
-        }, new Response.ErrorListener() {
+        LoginRequest loginRequest = new LoginRequest(Request.Method.GET, url, username, password, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 if (error instanceof TimeoutError) {
@@ -123,9 +106,24 @@ public enum IDWFApiImpl implements IDWFApi {
                     callback.onFail(new LoginException(error.getMessage(), error));
                 }
             }
+        }, new Response.Listener<LoginResponse>() {
+            @Override
+            public void onResponse(LoginResponse response) {
+                Log.d(Consts.LOGTAG,
+                        "loginResponse " + response.toString());
+                //parse response object to json
+                Type type = new TypeToken<LoginResponse>() {
+                }.getType();
+                Gson gson = new GsonBuilder().serializeNulls().create();
+                LoginResponse loginResponse = gson
+                        .fromJson(response.toString(), type);
+                Log.d(Consts.LOGTAG,
+                        "loginResponse " + loginResponse);
+                callback.onSuccess(loginResponse);
+            }
         });
 
-        getRequestQueue(context).add(request);
+        getRequestQueue(context).add(loginRequest);
     }
 
     @Override

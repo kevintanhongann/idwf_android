@@ -2,10 +2,12 @@ package org.idwfed.app.fragment;
 
 import android.app.ListFragment;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,12 +18,15 @@ import org.idwfed.app.api.IDWFApi;
 import org.idwfed.app.callback.PublicDocumentsCallback;
 import org.idwfed.app.domain.Item;
 import org.idwfed.app.exception.PublicDocumentsException;
+import org.idwfed.app.response.LoginResponse;
 import org.idwfed.app.response.PublicDocumentsResponse;
+import org.idwfed.app.util.LoginSuccessEvent;
 
 import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import de.greenrobot.event.EventBus;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -30,6 +35,11 @@ public class SharedListFragment extends ListFragment {
 
     private IDWFApi mIdwfApi;
 
+    private AdapterView.OnItemClickListener onItemClick = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        }
+    };
 
     public SharedListFragment() {
     }
@@ -60,7 +70,26 @@ public class SharedListFragment extends ListFragment {
             @Override
             public void onSuccess(PublicDocumentsResponse response) {
                 if (response != null) {
-                    getListView().setAdapter(new ItemsAdapter(getActivity().getApplicationContext(), R.layout.layout_doc_row, response.getItems()));
+                    ItemsAdapter itemsAdapter = new ItemsAdapter(getActivity().getApplicationContext(), R.layout.layout_doc_row, response.getItems());
+                    LoginSuccessEvent loginSuccessEvent = EventBus.getDefault().getStickyEvent(LoginSuccessEvent.class);
+                    if (loginSuccessEvent != null) {
+                        for (LoginResponse.Item item : loginSuccessEvent.getItems()) {
+                            /*Item docItem = new Item();
+                            docItem.setApiUrl(item.getApiUrl());
+                            docItem.setCreated(item.getCreated());
+                            docItem.setDescription(item.getDescription());
+                            docItem.setEffective(item.getEffective());
+                            docItem.setId(item.getId());
+                            docItem.setPortalType(item.getPortalType());
+                            docItem.setTags(item.getTags());
+                            docItem.setTitle(item.getTitle());
+                            docItem.setUid(item.getUid());
+                            docItem.setType(item.getType());
+                            itemsAdapter.add(docItem);*/
+                        }
+                    }
+                    getListView().setAdapter(itemsAdapter);
+                    getListView().setOnItemClickListener(onItemClick);
                 }
             }
         });

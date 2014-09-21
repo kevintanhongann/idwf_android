@@ -3,7 +3,9 @@ package org.idwfed.app;
 import android.app.Activity;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.TextureView;
@@ -80,10 +82,10 @@ public class LoginActivity extends Activity {
                         @Override
                         public void onSuccess(LoginResponse response) {
                             if (!response.getItems().isEmpty()) {
-
                                 Log.d(Consts.LOGTAG, "login response "+response.getItems());
-
                                 EventBus.getDefault().postSticky(new LoginSuccessEvent(response.getItems()));
+                                finish();
+                                NavUtils.navigateUpTo(LoginActivity.this, new Intent(LoginActivity.this, SharedListActivity.class));
                             }
 
                             if(progressDialog.isShowing()){

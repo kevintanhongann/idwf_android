@@ -73,7 +73,7 @@ public class SharedListFragment extends ListFragment {
                     ItemsAdapter itemsAdapter = new ItemsAdapter(getActivity().getApplicationContext(), R.layout.layout_doc_row, response.getItems());
                     LoginSuccessEvent loginSuccessEvent = EventBus.getDefault().getStickyEvent(LoginSuccessEvent.class);
                     if (loginSuccessEvent != null) {
-
+                        itemsAdapter.addAll(loginSuccessEvent.getItems());
                     }
                     getListView().setAdapter(itemsAdapter);
                     getListView().setOnItemClickListener(onItemClick);

@@ -3,6 +3,10 @@ package org.idwfed.app.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import org.idwfed.app.domain.Item;
+
+import java.util.List;
+
 /**
  * Created by kevintanhongann on 9/14/14.
  */

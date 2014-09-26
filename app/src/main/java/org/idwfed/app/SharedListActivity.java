@@ -3,6 +3,7 @@ package org.idwfed.app;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -10,14 +11,14 @@ import org.idwfed.app.fragment.SharedListFragment;
 import org.idwfed.app.util.PrefUtils;
 
 
-public class SharedListActivity extends Activity {
+public class SharedListActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shared_list);
         if (savedInstanceState == null) {
-            getFragmentManager().beginTransaction()
+            getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new SharedListFragment())
                     .commit();
         }
@@ -51,7 +52,7 @@ public class SharedListActivity extends Activity {
                 startActivity(loginIntent);
             }
         } else if (id == R.id.action_refresh) {
-            getFragmentManager().beginTransaction()
+            getSupportFragmentManager().beginTransaction()
                     .replace(R.id.container, new SharedListFragment())
                     .commit();
         }

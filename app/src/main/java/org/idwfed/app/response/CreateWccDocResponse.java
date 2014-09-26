@@ -8,6 +8,32 @@ import com.google.gson.annotations.SerializedName;
 public class CreateWccDocResponse {
 
     @Expose
+    private String error;
+    @Expose
+    private String message;
+    @Expose
+    private Boolean success;
+    @SerializedName("_runtime")
+    @Expose
+    private Double runtime;
+
+    public String getError() {
+        return error;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public Boolean getSuccess() {
+        return success;
+    }
+
+    public Double getRuntime() {
+        return runtime;
+    }
+
+    @Expose
     private String title;
     @Expose
     private String effective;
@@ -114,7 +140,11 @@ public class CreateWccDocResponse {
     @Override
     public String toString() {
         return "CreateWccDocResponse{" +
-                "title='" + title + '\'' +
+                "error='" + error + '\'' +
+                ", message='" + message + '\'' +
+                ", success=" + success +
+                ", runtime=" + runtime +
+                ", title='" + title + '\'' +
                 ", effective='" + effective + '\'' +
                 ", expires='" + expires + '\'' +
                 ", description='" + description + '\'' +

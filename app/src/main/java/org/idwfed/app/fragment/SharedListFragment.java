@@ -1,16 +1,17 @@
 package org.idwfed.app.fragment;
 
-import android.app.ListFragment;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.devspark.progressfragment.ProgressFragment;
 
 import org.idwfed.app.R;
 import org.idwfed.app.api.ApiFactory;
@@ -18,26 +19,28 @@ import org.idwfed.app.api.IDWFApi;
 import org.idwfed.app.callback.PublicDocumentsCallback;
 import org.idwfed.app.domain.Item;
 import org.idwfed.app.exception.PublicDocumentsException;
-import org.idwfed.app.response.LoginResponse;
 import org.idwfed.app.response.PublicDocumentsResponse;
-import org.idwfed.app.util.LoginSuccessEvent;
+import org.idwfed.app.util.PrefUtils;
 
 import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import de.greenrobot.event.EventBus;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class SharedListFragment extends ListFragment {
+public class SharedListFragment extends ProgressFragment {
 
     private IDWFApi mIdwfApi;
+
+    @InjectView(R.id.listView_docs)
+    ListView docsListView;
 
     private AdapterView.OnItemClickListener onItemClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
         }
     };
 
@@ -60,23 +63,23 @@ public class SharedListFragment extends ListFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         mIdwfApi.getPublicDocuments(getActivity().getApplicationContext(), new PublicDocumentsCallback() {
             @Override
             public void onFail(PublicDocumentsException exception) {
                 Toast.makeText(getActivity().getApplicationContext(), exception.getMessage(), Toast.LENGTH_SHORT).show();
+                setContentShown(true);
             }
 
             @Override
             public void onSuccess(PublicDocumentsResponse response) {
                 if (response != null) {
                     ItemsAdapter itemsAdapter = new ItemsAdapter(getActivity().getApplicationContext(), R.layout.layout_doc_row, response.getItems());
-                    LoginSuccessEvent loginSuccessEvent = EventBus.getDefault().getStickyEvent(LoginSuccessEvent.class);
-                    if (loginSuccessEvent != null) {
-                        itemsAdapter.addAll(loginSuccessEvent.getItems());
+                    if (PrefUtils.getUserDocs(getActivity()) != null) {
+                        itemsAdapter.addAll(PrefUtils.getUserDocs(getActivity()));
                     }
-                    getListView().setAdapter(itemsAdapter);
-                    getListView().setOnItemClickListener(onItemClick);
+                    docsListView.setAdapter(itemsAdapter);
+                    setContentShown(true);
+                    docsListView.setOnItemClickListener(onItemClick);
                 }
             }
         });

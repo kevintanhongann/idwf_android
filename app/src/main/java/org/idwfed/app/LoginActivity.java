@@ -85,6 +85,7 @@ public class LoginActivity extends Activity {
                                 PrefUtils.setUsername(LoginActivity.this, etUsername.getText().toString());
                                 //FIXME store password in char array
                                 PrefUtils.setPassword(LoginActivity.this, etPassword.getText().toString());
+                                PrefUtils.setUserDocs(LoginActivity.this, response.getItems());
                                 finish();
                                 NavUtils.navigateUpTo(LoginActivity.this, new Intent(LoginActivity.this, SharedListActivity.class));
                             }

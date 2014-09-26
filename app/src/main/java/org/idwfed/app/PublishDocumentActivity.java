@@ -1,6 +1,9 @@
 package org.idwfed.app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,9 +12,11 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.app.NavUtils;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -75,12 +80,12 @@ public class PublishDocumentActivity extends Activity {
     @InjectView(R.id.button_submit)
     Button submitBtn;
 
-
     List<String> countries = new ArrayList<String>();
 
     private View.OnClickListener onSubmitClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+
             if (TextUtils.isEmpty(etTitleTxt.getText().toString())) {
                 etTitleTxt.setError(getString(R.string.text_required_field));
             } else if (TextUtils.isEmpty(etBodyTxt.getText().toString())) {
@@ -88,22 +93,47 @@ public class PublishDocumentActivity extends Activity {
             } else if (TextUtils.isEmpty(etDescription.getText().toString())) {
                 etDescription.setError(getString(R.string.text_required_field));
             } else {
+                final ProgressDialog progressDialog = ProgressDialog.show(PublishDocumentActivity.this, "", "Submitting...", false, false);
 
-                if(!PrefUtils.getServerUrl(PublishDocumentActivity.this).isEmpty()){
-
+                String url;
+                if (PrefUtils.getServerUrl(PublishDocumentActivity.this).isEmpty()) {
+                    url = getString(R.string.server_url) + getString(R.string.createdoc_path);
+                }else{
+                    url = PrefUtils.getServerUrl(PublishDocumentActivity.this) + getString(R.string.createdoc_path);
                 }
-
-                /*idwfApi.createWccDoc(this, etTitleTxt.getText().toString(), etDescription.getText().toString(),etBodyTxt.getText().toString(), countrySpinner.getSelectedItem(), url, new CreateWccDocumentCallback() {
+                idwfApi.createWccDoc(getApplicationContext(), etTitleTxt.getText().toString(), etDescription.getText().toString(), etBodyTxt.getText().toString(), "", url, "", new CreateWccDocumentCallback() {
                     @Override
                     public void onFail(CreateWccDocException ex) {
-                        Toast.makeText(PublishDocumentActivity.this, ex.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), ex.getMessage(), Toast.LENGTH_SHORT).show();
+                        if(progressDialog.isShowing()){
+                            progressDialog.dismiss();
+                        }
                     }
 
                     @Override
                     public void onSuccess(CreateWccDocResponse response) {
 
+                        if(progressDialog.isShowing()){
+                            progressDialog.dismiss();
+                        }
+
+                        if(response.getSuccess()){
+                            AlertDialog dialog = new AlertDialog.Builder(PublishDocumentActivity.this)
+                                    .setTitle("Status")
+                                    .setMessage("Document Created!")
+                                    .setPositiveButton("Back to Main", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            NavUtils.navigateUpTo(PublishDocumentActivity.this, new Intent(PublishDocumentActivity.this, SharedListActivity.class));
+                                        }
+                                    }).create();
+                            dialog.show();
+                        }else{
+                            Toast.makeText(PublishDocumentActivity.this, response.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+
                     }
-                });*/
+                });
             }
         }
     };
@@ -122,13 +152,13 @@ public class PublishDocumentActivity extends Activity {
         countries.add("Indonesia");
 
 // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, countries);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(PublishDocumentActivity.this, android.R.layout.simple_spinner_item, countries);
 // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 // Apply the adapter to the spinner
         countrySpinner.setAdapter(adapter);
 
-        Intent receivedIntent = getIntent();
+        /*Intent receivedIntent = getIntent();
         String receivedAction = receivedIntent.getAction();
         String receivedType = receivedIntent.getType();
         if (receivedAction != null) {
@@ -154,7 +184,7 @@ public class PublishDocumentActivity extends Activity {
             } else if (receivedAction.equals(Intent.ACTION_MAIN)) {
                 etDescription.setText("Nothing has been shared");
             }
-        }
+        }*/
 
 
         submitBtn.setOnClickListener(onSubmitClick);

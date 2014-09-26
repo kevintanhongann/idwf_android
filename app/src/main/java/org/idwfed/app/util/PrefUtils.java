@@ -3,8 +3,12 @@ package org.idwfed.app.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.idwfed.app.domain.Item;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -40,6 +44,18 @@ public class PrefUtils {
 
     public static String getPassword(Context context){
         return getPreferences(context).getString("idwf.app.password", "");
+    }
+
+    public static void setUserDocs(Context context, List<Item> items){
+        Gson gson = new Gson();
+        String json = gson.toJson(items);
+        getPreferences(context).edit().putString("idwf.app.items", json).commit();
+    }
+
+    public static List<Item> getUserDocs(Context context){
+        Type collectionType = new TypeToken<List<Item>>() {
+        }.getType();
+        return new Gson().fromJson(getPreferences(context).getString("idwf.app.items", ""), collectionType);
     }
 
 }

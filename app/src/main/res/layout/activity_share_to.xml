@@ -69,6 +69,8 @@
                 android:layout_height="wrap_content"
                 android:inputType="textMultiLine"
                 android:ems="10"
+                android:lines="5"
+                android:maxLines="5"
                 android:id="@+id/editText_bodyTxt" />
         </TableRow>
 

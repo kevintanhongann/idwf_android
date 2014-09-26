@@ -16,12 +16,15 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import org.idwfed.app.callback.CreateWccDocumentCallback;
+import org.idwfed.app.callback.FoldersCallback;
 import org.idwfed.app.callback.LoginCallback;
 import org.idwfed.app.callback.PublicDocumentsCallback;
 import org.idwfed.app.exception.CreateWccDocException;
+import org.idwfed.app.exception.FoldersException;
 import org.idwfed.app.exception.LoginException;
 import org.idwfed.app.exception.PublicDocumentsException;
 import org.idwfed.app.request.LoginRequest;
+import org.idwfed.app.response.FoldersResponse;
 import org.idwfed.app.response.LoginResponse;
 import org.idwfed.app.response.CreateWccDocResponse;
 import org.idwfed.app.response.PublicDocumentsResponse;
@@ -40,18 +43,12 @@ public enum IDWFApiImpl implements IDWFApi {
 
     private RequestQueue rq;
 
-
     @Override
-    public void createWccDoc(Context context, String title, String description, String body, String country, String url, final CreateWccDocumentCallback callback) {
+    public void createWccDoc(Context context, String title, String description, String body, String country, String url, String uid, final CreateWccDocumentCallback callback) {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("title", title);
             jsonObject.put("description", description);
-            jsonObject.put("effective", "2001-05-11");
-            jsonObject.put("expires", "2015-12-11");
-            jsonObject.put("subjects", "[]");
-            jsonObject.put("document_type", "Letter");
-            jsonObject.put("document_owner", "admin");
             jsonObject.put("text", body);
 
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObject, new Response.Listener<JSONObject>() {
@@ -86,6 +83,40 @@ public enum IDWFApiImpl implements IDWFApi {
             callback.onFail(new CreateWccDocException(e.getMessage(), e));
         }
 
+    }
+
+    @Override
+    public void getFolders(Context context, String url, final FoldersCallback callback) {
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,  null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.d(Consts.LOGTAG,
+                        "getFolders response " + response.toString());
+                //parse response object to json
+                Type type = new TypeToken<FoldersResponse>() {
+                }.getType();
+                Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZ").serializeNulls().create();
+                FoldersResponse foldersResponse = gson
+                        .fromJson(response.toString(), type);
+                Log.d(Consts.LOGTAG,
+                        "foldersResponse " + foldersResponse);
+                callback.onSuccess(foldersResponse);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if(error instanceof TimeoutError){
+                    callback.onFail(new FoldersException("Request timeout", error));
+                }else if(error instanceof NoConnectionError){
+                    callback.onFail(new FoldersException("No connection", error));
+                }else{
+                    callback.onFail(new FoldersException(error.getMessage(), error));
+                }
+            }
+        });
+
+        getRequestQueue(context).add(request);
     }
 
     @Override
@@ -163,6 +194,7 @@ public enum IDWFApiImpl implements IDWFApi {
 
         getRequestQueue(context).add(request);
     }
+
 
 
 }

@@ -98,14 +98,14 @@ public class PublishDocumentActivity extends Activity {
                 String url;
                 if (PrefUtils.getServerUrl(PublishDocumentActivity.this).isEmpty()) {
                     url = getString(R.string.server_url) + getString(R.string.createdoc_path);
-                }else{
+                } else {
                     url = PrefUtils.getServerUrl(PublishDocumentActivity.this) + getString(R.string.createdoc_path);
                 }
-                idwfApi.createWccDoc(getApplicationContext(), etTitleTxt.getText().toString(), etDescription.getText().toString(), etBodyTxt.getText().toString(), "", url, "", new CreateWccDocumentCallback() {
+                idwfApi.createWccDoc(getApplicationContext(), etTitleTxt.getText().toString(), etDescription.getText().toString(), etBodyTxt.getText().toString(), "", url, "", PrefUtils.getUsername(PublishDocumentActivity.this), PrefUtils.getPassword(PublishDocumentActivity.this), new CreateWccDocumentCallback() {
                     @Override
                     public void onFail(CreateWccDocException ex) {
                         Toast.makeText(getApplicationContext(), ex.getMessage(), Toast.LENGTH_SHORT).show();
-                        if(progressDialog.isShowing()){
+                        if (progressDialog.isShowing()) {
                             progressDialog.dismiss();
                         }
                     }
@@ -113,11 +113,11 @@ public class PublishDocumentActivity extends Activity {
                     @Override
                     public void onSuccess(CreateWccDocResponse response) {
 
-                        if(progressDialog.isShowing()){
+                        if (progressDialog.isShowing()) {
                             progressDialog.dismiss();
                         }
 
-                        if(response.getSuccess()){
+                        if (response.getItems() != null) {
                             AlertDialog dialog = new AlertDialog.Builder(PublishDocumentActivity.this)
                                     .setTitle("Status")
                                     .setMessage("Document Created!")
@@ -128,7 +128,7 @@ public class PublishDocumentActivity extends Activity {
                                         }
                                     }).create();
                             dialog.show();
-                        }else{
+                        } else {
                             Toast.makeText(PublishDocumentActivity.this, response.getMessage(), Toast.LENGTH_SHORT).show();
                         }
 
@@ -151,41 +151,12 @@ public class PublishDocumentActivity extends Activity {
         countries.add("Malaysia");
         countries.add("Indonesia");
 
-// Create an ArrayAdapter using the string array and a default spinner layout
+        // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(PublishDocumentActivity.this, android.R.layout.simple_spinner_item, countries);
-// Specify the layout to use when the list of choices appears
+        // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-// Apply the adapter to the spinner
+        // Apply the adapter to the spinner
         countrySpinner.setAdapter(adapter);
-
-        /*Intent receivedIntent = getIntent();
-        String receivedAction = receivedIntent.getAction();
-        String receivedType = receivedIntent.getType();
-        if (receivedAction != null) {
-            if (receivedAction.equals(Intent.ACTION_SEND)) {
-                if (receivedType.startsWith("text/")) {
-                    String receivedText = receivedIntent.getStringExtra(Intent.EXTRA_TEXT);
-                    if (receivedText != null) {
-                        etDescription.setText(receivedText);
-                    }
-                    String receivedSubject = receivedIntent.getStringExtra(Intent.EXTRA_SUBJECT);
-                    if (receivedSubject != null) {
-                        etTitleTxt.setText(receivedSubject);
-                    }
-
-                    Bundle bundle = receivedIntent.getExtras();
-                    for (String key : bundle.keySet()) {
-                        Object value = bundle.get(key);
-                        Log.d("IDWF - intent", String.format("%s %s (%s)", key,
-                                value.toString(), value.getClass().getName()));
-                    }
-
-                }
-            } else if (receivedAction.equals(Intent.ACTION_MAIN)) {
-                etDescription.setText("Nothing has been shared");
-            }
-        }*/
-
 
         submitBtn.setOnClickListener(onSubmitClick);
     }

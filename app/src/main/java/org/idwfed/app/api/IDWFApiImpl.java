@@ -23,6 +23,7 @@ import org.idwfed.app.exception.CreateWccDocException;
 import org.idwfed.app.exception.FoldersException;
 import org.idwfed.app.exception.LoginException;
 import org.idwfed.app.exception.PublicDocumentsException;
+import org.idwfed.app.request.CreateWccDocRequest;
 import org.idwfed.app.request.LoginRequest;
 import org.idwfed.app.response.FoldersResponse;
 import org.idwfed.app.response.LoginResponse;
@@ -44,14 +45,14 @@ public enum IDWFApiImpl implements IDWFApi {
     private RequestQueue rq;
 
     @Override
-    public void createWccDoc(Context context, String title, String description, String body, String country, String url, String uid, final CreateWccDocumentCallback callback) {
+    public void createWccDoc(Context context, String title, String description, String body, String country, String url, String uid, String username, String password, final CreateWccDocumentCallback callback) {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("title", title);
             jsonObject.put("description", description);
             jsonObject.put("text", body);
 
-            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObject, new Response.Listener<JSONObject>() {
+            CreateWccDocRequest request = new CreateWccDocRequest(Request.Method.POST, url, username, password, jsonObject, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     Log.d(Consts.LOGTAG,
@@ -78,6 +79,7 @@ public enum IDWFApiImpl implements IDWFApi {
                     }
                 }
             });
+
             getRequestQueue(context).add(request);
         } catch (JSONException e) {
             callback.onFail(new CreateWccDocException(e.getMessage(), e));

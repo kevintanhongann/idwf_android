@@ -41,6 +41,7 @@ import org.apache.http.util.EntityUtils;
 import org.idwfed.app.api.ApiFactory;
 import org.idwfed.app.api.IDWFApi;
 import org.idwfed.app.callback.CreateWccDocumentCallback;
+import org.idwfed.app.domain.Item;
 import org.idwfed.app.exception.CreateWccDocException;
 import org.idwfed.app.response.CreateWccDocResponse;
 import org.idwfed.app.util.PrefUtils;
@@ -158,6 +159,21 @@ public class PublishDocumentActivity extends Activity {
         // Apply the adapter to the spinner
         countrySpinner.setAdapter(adapter);
 
+
+        // Get intent, action and MIME type
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
+
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
+            if ("text/plain".equals(type)) {
+                String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+                if (sharedText != null) {
+                    etTitleTxt.setText(sharedText);
+                }
+            }
+        }
+
         submitBtn.setOnClickListener(onSubmitClick);
     }
 
@@ -250,121 +266,4 @@ public class PublishDocumentActivity extends Activity {
                 return;
         }
     }
-
-/*
-    public void doShare() {
-        // Create a new HttpClient and Post Header
-        class SendPostReqAsyncTask extends AsyncTask<String, Void, Boolean> {
-
-            protected void onPostExecute(Boolean status) {
-                String message = "";
-                if (status) {
-                    message = "Item successfully shared";
-                } else {
-                    message = "Failed to share item";
-                }
-                Toast toast;
-                toast = Toast.makeText(getApplicationContext(),
-                        message, Toast.LENGTH_SHORT);
-                toast.show();
-                if (status) {
-                    finish();
-                }
-            }
-
-            protected Boolean doInBackground(String... params) {
-
-                HttpClient httpclient = new DefaultHttpClient();
-                Boolean success = false;
-
-                String urlqueryid = settings.getString("serverurl", "") + "/@@API/plone/api/1.0/folders?q=idwfshared";
-
-                Log.d("IDWF - urlqueryid", urlqueryid);
-                HttpGet queryidpost = new HttpGet(urlqueryid);
-                String uid = "";
-                try {
-                    HttpResponse idresponse = httpclient.execute(queryidpost);
-                    String idresponsetext = null;
-                    try {
-                        idresponsetext = EntityUtils.toString(idresponse.getEntity());
-                        Log.d("IDWF - idresponse", idresponsetext);
-                        JSONObject idjson = new JSONObject(idresponsetext);
-                        JSONArray juid = idjson.getJSONArray("items");
-                        uid = juid.getJSONObject(0).getString("uid");
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                        Log.i("Parse Exception", e + "");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-
-                String serverurl = settings.getString("serverurl", "") + "/@@API/plone/api/1.0/documents/create/" + uid;
-                //String serverurl = settings.getString("serverurl", "");
-                Log.d("IDWF", "Login:" + serverurl);
-                HttpPost httppost = new HttpPost(serverurl);
-
-
-                String credentials = settings.getString("username", "") + ":" + settings.getString("password", "");
-                String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                httppost.addHeader("Authorization", "Basic " + base64EncodedCredentials);
-                try {
-
-                    JSONObject jsonobj = new JSONObject();
-
-                    jsonobj.put("title", etTitleTxt.getText());
-                    jsonobj.put("description", etDescription.getText());
-                    jsonobj.put("effective", "2001-05-11");
-                    jsonobj.put("expires", "2015-12-11");
-                    jsonobj.put("subjects", "[]");
-                    jsonobj.put("document_type", "Letter");
-                    jsonobj.put("document_owner", "admin");
-                    jsonobj.put("text", etBodyTxt.getText());
-
-                    StringEntity se = new StringEntity(jsonobj.toString());
-                    se.setContentType("application/json;charset=UTF-8");
-                    se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json;charset=UTF-8"));
-
-                    httppost.setEntity(se);
-
-                    // Execute HTTP Post Request
-                    HttpResponse response = httpclient.execute(httppost);
-
-                    Log.d("IDWF - response", response.toString());
-
-                    String responseText = null;
-                    try {
-                        responseText = EntityUtils.toString(response.getEntity());
-                        JSONObject respjson = new JSONObject(responseText);
-                        Integer count = respjson.getInt("count");
-                        if (count > 0) {
-                            success = true;
-                        }
-                        Log.d("IDWF - succcess", success.toString());
-
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                        Log.i("Parse Exception", e + "");
-                    }
-
-                    Log.d("IDWF - response Text", responseText);
-
-
-                } catch (ClientProtocolException e) {
-                    // TODO Auto-generated catch block
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                return success;
-            }
-        }
-        SendPostReqAsyncTask postreq = new SendPostReqAsyncTask();
-        postreq.execute();
-    }
-*/
 }

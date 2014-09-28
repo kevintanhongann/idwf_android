@@ -66,13 +66,15 @@ public class SharedListFragment extends ProgressFragment {
         mIdwfApi.getPublicDocuments(getActivity().getApplicationContext(), new PublicDocumentsCallback() {
             @Override
             public void onFail(PublicDocumentsException exception) {
-                Toast.makeText(getActivity().getApplicationContext(), exception.getMessage(), Toast.LENGTH_SHORT).show();
-                setContentShown(true);
+                if (getView() != null) {
+                    Toast.makeText(getActivity(), exception.getMessage(), Toast.LENGTH_SHORT).show();
+                    setContentShown(true);
+                }
             }
 
             @Override
             public void onSuccess(PublicDocumentsResponse response) {
-                if (response != null) {
+                if (response != null && getView() != null) {
                     ItemsAdapter itemsAdapter = new ItemsAdapter(getActivity().getApplicationContext(), R.layout.layout_doc_row, response.getItems());
                     if (PrefUtils.getUserDocs(getActivity()) != null) {
                         itemsAdapter.addAll(PrefUtils.getUserDocs(getActivity()));

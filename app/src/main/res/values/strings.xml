@@ -16,5 +16,42 @@
     <string name="text_required_field">Required field</string>
     <string name="text_invalid_url">Invalid URL</string>
     <string name="text_login">Login</string>
-
+    <string-array name="related_themes_string">
+        <item>C189 Ratification</item>
+        <item>Child Domestic Workers</item>
+        <item>Collective Bargaining</item>
+        <item>Communication</item>
+        <item>Days Off &amp; Hours of Work</item>
+        <item>Dignity of Domestic Workers</item>
+        <item>Domestic Workers Bills</item>
+        <item>Employment &amp; Working Conditions</item>
+        <item>Forced Labour</item>
+        <item>History</item>
+        <item>Migrant Domestic Workers</item>
+        <item>Occupational Safety &amp; Health</item>
+        <item>Participatory Research</item>
+        <item>Private Employment Agencies</item>
+        <item>Rights to Organize</item>
+        <item>Sexual Harassment</item>
+        <item>Workers' Rights</item>
+    </string-array>
+    <string-array name="related_themes">
+        <item>c189</item>
+        <item>child domestic workers</item>
+        <item>collective bargaining</item>
+        <item>communication</item>
+        <item>hoursofwork</item>
+        <item>dignity</item>
+        <item>bills</item>
+        <item>working conditions</item>
+        <item>forced labour</item>
+        <item>history</item>
+        <item>migrant</item>
+        <item>occupational safety</item>
+        <item>research</item>
+        <item>private agencies</item>
+        <item>organize</item>
+        <item>harassment</item>
+        <item>worker rights</item>
+    </string-array>
 </resources>

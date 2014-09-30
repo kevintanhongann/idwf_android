@@ -131,7 +131,7 @@
 
     <Button
         android:id="@+id/button_submit"
-        android:text="Submit Document"
+        android:text="Share Update"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

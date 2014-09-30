@@ -44,11 +44,13 @@ import org.idwfed.app.callback.CreateWccDocumentCallback;
 import org.idwfed.app.domain.Item;
 import org.idwfed.app.exception.CreateWccDocException;
 import org.idwfed.app.response.CreateWccDocResponse;
+import org.idwfed.app.util.Consts;
 import org.idwfed.app.util.PrefUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -81,6 +83,9 @@ public class PublishDocumentActivity extends Activity {
     @InjectView(R.id.button_submit)
     Button submitBtn;
 
+    @InjectView(R.id.spinner_relatedThemes)
+    Spinner relatedThemesSpinner;
+
     List<String> countries = new ArrayList<String>();
 
     private View.OnClickListener onSubmitClick = new View.OnClickListener() {
@@ -102,7 +107,9 @@ public class PublishDocumentActivity extends Activity {
                 } else {
                     url = PrefUtils.getServerUrl(PublishDocumentActivity.this) + getString(R.string.createdoc_path);
                 }
-                idwfApi.createWccDoc(getApplicationContext(), etTitleTxt.getText().toString(), etDescription.getText().toString(), etBodyTxt.getText().toString(), "", url, "", PrefUtils.getUsername(PublishDocumentActivity.this), PrefUtils.getPassword(PublishDocumentActivity.this), new CreateWccDocumentCallback() {
+
+
+                idwfApi.createWccDoc(getApplicationContext(), etTitleTxt.getText().toString(), etDescription.getText().toString(), etBodyTxt.getText().toString(), countrySpinner.getSelectedItem().toString(), url, "", PrefUtils.getUsername(PublishDocumentActivity.this),PrefUtils.getPassword(PublishDocumentActivity.this), imageDataStr, "image/*", "", "", "", relatedThemesSpinner.getSelectedItem().toString(), new CreateWccDocumentCallback() {
                     @Override
                     public void onFail(CreateWccDocException ex) {
                         Toast.makeText(getApplicationContext(), ex.getMessage(), Toast.LENGTH_SHORT).show();
@@ -113,7 +120,6 @@ public class PublishDocumentActivity extends Activity {
 
                     @Override
                     public void onSuccess(CreateWccDocResponse response) {
-
                         if (progressDialog.isShowing()) {
                             progressDialog.dismiss();
                         }
@@ -132,7 +138,6 @@ public class PublishDocumentActivity extends Activity {
                         } else {
                             Toast.makeText(PublishDocumentActivity.this, response.getMessage(), Toast.LENGTH_SHORT).show();
                         }
-
                     }
                 });
             }
@@ -140,6 +145,7 @@ public class PublishDocumentActivity extends Activity {
     };
 
     private IDWFApi idwfApi;
+    private String imageDataStr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,6 +165,10 @@ public class PublishDocumentActivity extends Activity {
         // Apply the adapter to the spinner
         countrySpinner.setAdapter(adapter);
 
+        List<String> themes = new ArrayList<String>();
+        themes.add("Domestic Worker");
+
+        relatedThemesSpinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, themes));
 
         // Get intent, action and MIME type
         Intent intent = getIntent();
@@ -250,10 +260,15 @@ public class PublishDocumentActivity extends Activity {
             case SELECT_PHOTO:
                 if (resultCode == RESULT_OK) {
                     Uri selectedImage = imageReturnedIntent.getData();
+                    Bitmap bm = BitmapFactory.decodeFile(selectedImage.getPath());
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    bm.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
+                    byte[] b = baos.toByteArray();
+                    imageDataStr = Base64.encodeToString(b, Base64.DEFAULT);
                     try {
                         imageView.setImageBitmap(decodeUri(selectedImage));
                     } catch (FileNotFoundException e) {
-                        e.printStackTrace();
+                       Log.e(Consts.LOGTAG, e.getMessage(), e);
                     }
                 }
                 return;
@@ -261,6 +276,11 @@ public class PublishDocumentActivity extends Activity {
                 if (resultCode == RESULT_OK) {
                     Bundle extras = imageReturnedIntent.getExtras();
                     Bitmap imageBitmap = (Bitmap) extras.get("data");
+
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+                    byte[] fullBytes = byteArrayOutputStream.toByteArray();
+                    imageDataStr = Base64.encodeToString(fullBytes, Base64.DEFAULT);
                     imageView.setImageBitmap(imageBitmap);
                 }
                 return;

@@ -2,7 +2,6 @@ package org.idwfed.app.api;
 
 import android.content.Context;
 import android.util.Log;
-
 import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -45,13 +44,24 @@ public enum IDWFApiImpl implements IDWFApi {
     private RequestQueue rq;
 
     @Override
-    public void createWccDoc(Context context, String title, String description, String body, String country, String url, String uid, String username, String password, final CreateWccDocumentCallback callback) {
+    public void createWccDoc(Context context, String title, String description, String body, String country, String url, String uid, String username, String password, String imageData, String imageContentType, String imageCaption, String sourceCaption, String sourceUrl, String theme, final CreateWccDocumentCallback callback) {
         JSONObject jsonObject = new JSONObject();
         try {
+
             jsonObject.put("title", title);
             jsonObject.put("description", description);
             jsonObject.put("text", body);
+            jsonObject.put("source_url", sourceUrl);
+            jsonObject.put("source_caption", sourceCaption);
+            jsonObject.put("idwf_themes", theme);
+            jsonObject.put("image_caption", imageCaption);
+            jsonObject.put("related_countries", country);
+            JSONObject imageJsonObject = new JSONObject();
 
+            imageJsonObject.put("data", imageData);
+            imageJsonObject.put("ilename", "string");
+            imageJsonObject.put("content_type", imageContentType);
+            jsonObject.put("image", imageJsonObject);
             CreateWccDocRequest request = new CreateWccDocRequest(Request.Method.POST, url, username, password, jsonObject, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {

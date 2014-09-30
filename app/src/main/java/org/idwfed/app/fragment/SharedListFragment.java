@@ -1,6 +1,8 @@
 package org.idwfed.app.fragment;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,7 +42,10 @@ public class SharedListFragment extends ProgressFragment {
     private AdapterView.OnItemClickListener onItemClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            Item item = (Item) parent.getAdapter().getItem(position);
+            intent.setData(Uri.parse(item.getUrl()));
+            startActivity(intent);
         }
     };
 

@@ -30,6 +30,7 @@ import org.idwfed.app.response.LoginResponse;
 import org.idwfed.app.response.CreateWccDocResponse;
 import org.idwfed.app.response.PublicDocumentsResponse;
 import org.idwfed.app.util.Consts;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -55,11 +56,15 @@ public enum IDWFApiImpl implements IDWFApi {
             jsonObject.put("source_url", sourceUrl);
             jsonObject.put("source_caption", sourceCaption);
             if (themes != null) {
-                jsonObject.put("idwf_themes", themes.toArray());
+                JSONArray themesJsonArray = new JSONArray(themes);
+                //jsonObject.put("idwf_themes", themes.toArray(new String[themes.size()]));
+                jsonObject.put("idwf_themes", themesJsonArray);
             }
             jsonObject.put("image_caption", imageCaption);
             if (countries != null) {
-                jsonObject.put("related_countries", countries.toArray());
+                JSONArray countriesJsonAry = new JSONArray(countries);
+                //jsonObject.put("related_countries", countries.toArray(new String[countries.size()]));
+                jsonObject.put("related_countries", countriesJsonAry);
             }
             JSONObject imageJsonObject = new JSONObject();
 

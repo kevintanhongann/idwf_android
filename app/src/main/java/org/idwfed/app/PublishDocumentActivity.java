@@ -129,8 +129,7 @@ public class PublishDocumentActivity extends Activity {
                         if (progressDialog.isShowing()) {
                             progressDialog.dismiss();
                         }
-
-                        if (response.getItems() != null) {
+                        if (response.getItems() != null && response.getError() == null) {
                             AlertDialog dialog = new AlertDialog.Builder(PublishDocumentActivity.this)
                                     .setTitle("Status")
                                     .setMessage("Document Created!")
@@ -149,10 +148,16 @@ public class PublishDocumentActivity extends Activity {
             }
         }
     };
+    private List<String> displayCountries;
 
     @OnClick(R.id.button_relatedThemes)
     void onRelatedThemesClick() {
         boolean[] booleanAry = new boolean[relatedThemesStr.length];
+
+        //set values to true
+        for (Integer integer : themesInt) {
+            booleanAry[integer] = true;
+        }
         AlertDialog multiSelectDialog = new AlertDialog.Builder(PublishDocumentActivity.this)
                 .setTitle("Choose Related Themes")
                 .setMultiChoiceItems(relatedThemesStr, booleanAry, new DialogInterface.OnMultiChoiceClickListener() {
@@ -181,11 +186,11 @@ public class PublishDocumentActivity extends Activity {
     @OnClick(R.id.button_countries)
     void onCountriesClick() {
         boolean[] booleanAry = new boolean[Locale.getISOCountries().length];
-        final List<String> displayCountries = new ArrayList<String>();
-        for (String countryCode : Locale.getISOCountries()) {
-            Locale obj = new Locale("", countryCode);
-            displayCountries.add(obj.getDisplayCountry());
+
+        for (Integer integer : countriesInt) {
+            booleanAry[integer] = true;
         }
+
         CharSequence[] cs = displayCountries.toArray(new CharSequence[displayCountries.size()]);
         AlertDialog countriesDialog = new AlertDialog.Builder(PublishDocumentActivity.this)
                 .setTitle("Select Countries")
@@ -222,6 +227,13 @@ public class PublishDocumentActivity extends Activity {
         idwfApi = ApiFactory.INSTANCE.getIDWFApi();
         relatedThemes = getResources().getStringArray(R.array.related_themes);
         relatedThemesStr = getResources().getStringArray(R.array.related_themes_string);
+
+         displayCountries = new ArrayList<String>();
+        for (String countryCode : Locale.getISOCountries()) {
+            Locale obj = new Locale("", countryCode);
+            displayCountries.add(obj.getDisplayCountry());
+        }
+
         // Get intent, action and MIME type
         Intent intent = getIntent();
         String action = intent.getAction();
@@ -312,16 +324,21 @@ public class PublishDocumentActivity extends Activity {
             case SELECT_PHOTO:
                 if (resultCode == RESULT_OK) {
                     Uri selectedImage = imageReturnedIntent.getData();
-                    Bitmap bm = BitmapFactory.decodeFile(selectedImage.getPath());
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    bm.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
-                    byte[] b = baos.toByteArray();
-                    imageDataStr = Base64.encodeToString(b, Base64.DEFAULT);
                     try {
-                        imageView.setImageBitmap(decodeUri(selectedImage));
-                    } catch (FileNotFoundException e) {
-                        Log.e(Consts.LOGTAG, e.getMessage(), e);
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
+                        byte[] b = baos.toByteArray();
+                        imageDataStr = Base64.encodeToString(b, Base64.DEFAULT);
+                        try {
+                            imageView.setImageBitmap(decodeUri(selectedImage));
+                        } catch (FileNotFoundException e) {
+                            Log.e(Consts.LOGTAG, e.getMessage(), e);
+                        }
+                    } catch (IOException e) {
+                        Log.e(Consts.LOGTAG, "IOException", e);
                     }
+
                 }
                 return;
             case CAPTURE_PHOTO:

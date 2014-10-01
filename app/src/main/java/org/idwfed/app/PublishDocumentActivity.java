@@ -16,15 +16,19 @@ import android.support.v4.app.NavUtils;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -55,9 +59,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 
 
 public class PublishDocumentActivity extends Activity {
@@ -77,17 +83,18 @@ public class PublishDocumentActivity extends Activity {
     @InjectView(R.id.imageView)
     ImageView imageView;
 
-    @InjectView(R.id.spinner_country)
-    Spinner countrySpinner;
-
     @InjectView(R.id.button_submit)
     Button submitBtn;
 
-    @InjectView(R.id.spinner_relatedThemes)
-    Spinner relatedThemesSpinner;
-
     List<String> countries = new ArrayList<String>();
-
+    List<Integer> themesInt = new ArrayList<Integer>();
+    List<Integer> countriesInt = new ArrayList<Integer>();
+    private IDWFApi idwfApi;
+    private String imageDataStr;
+    private String[] relatedThemes;
+    private String[] relatedThemesStr;
+    private List<String> selectedCountries;
+    private List<String> themes;
     private View.OnClickListener onSubmitClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -108,8 +115,7 @@ public class PublishDocumentActivity extends Activity {
                     url = PrefUtils.getServerUrl(PublishDocumentActivity.this) + getString(R.string.createdoc_path);
                 }
 
-
-                idwfApi.createWccDoc(getApplicationContext(), etTitleTxt.getText().toString(), etDescription.getText().toString(), etBodyTxt.getText().toString(), countrySpinner.getSelectedItem().toString(), url, "", PrefUtils.getUsername(PublishDocumentActivity.this),PrefUtils.getPassword(PublishDocumentActivity.this), imageDataStr, "image/*", "", "", "", relatedThemesSpinner.getSelectedItem().toString(), new CreateWccDocumentCallback() {
+                idwfApi.createWccDoc(getApplicationContext(), etTitleTxt.getText().toString(), etDescription.getText().toString(), etBodyTxt.getText().toString(), countries, url, "", PrefUtils.getUsername(PublishDocumentActivity.this), PrefUtils.getPassword(PublishDocumentActivity.this), imageDataStr, "image/*", "", "", "", themes, new CreateWccDocumentCallback() {
                     @Override
                     public void onFail(CreateWccDocException ex) {
                         Toast.makeText(getApplicationContext(), ex.getMessage(), Toast.LENGTH_SHORT).show();
@@ -144,32 +150,78 @@ public class PublishDocumentActivity extends Activity {
         }
     };
 
-    private IDWFApi idwfApi;
-    private String imageDataStr;
+    @OnClick(R.id.button_relatedThemes)
+    void onRelatedThemesClick() {
+        boolean[] booleanAry = new boolean[relatedThemesStr.length];
+        AlertDialog multiSelectDialog = new AlertDialog.Builder(PublishDocumentActivity.this)
+                .setTitle("Choose Related Themes")
+                .setMultiChoiceItems(relatedThemesStr, booleanAry, new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                        if(isChecked){
+                            themesInt.add(which);
+                        }else if(themesInt.contains(which)){
+                            themesInt.remove(Integer.valueOf(which));
+                        }
+                    }
+                })
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        themes = new ArrayList<String>();
+                        for (Integer integer : themesInt) {
+                            themes.add(relatedThemes[integer]);
+                        }
+                    }
+                })
+                .create();
+        multiSelectDialog.show();
+    }
+
+    @OnClick(R.id.button_countries)
+    void onCountriesClick() {
+        boolean[] booleanAry = new boolean[Locale.getISOCountries().length];
+        final List<String> displayCountries = new ArrayList<String>();
+        for (String countryCode : Locale.getISOCountries()) {
+            Locale obj = new Locale("", countryCode);
+            displayCountries.add(obj.getDisplayCountry());
+        }
+        CharSequence[] cs = displayCountries.toArray(new CharSequence[displayCountries.size()]);
+        AlertDialog countriesDialog = new AlertDialog.Builder(PublishDocumentActivity.this)
+                .setTitle("Select Countries")
+                .setMultiChoiceItems(cs, booleanAry, new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                        if (isChecked) {
+                            // If user select a item then add it in selected items
+                            countriesInt.add(which);
+                        } else if (countriesInt.contains(which)) {
+                            // if the item is already selected then remove it
+                            countriesInt.remove(Integer.valueOf(which));
+                        }
+                    }
+                })
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        selectedCountries = new ArrayList<String>();
+                        for (Integer integer : countriesInt) {
+                            selectedCountries.add(displayCountries.get(integer));
+                        }
+                    }
+                })
+                .create();
+        countriesDialog.show();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_share_to);
         ButterKnife.inject(this);
-
         idwfApi = ApiFactory.INSTANCE.getIDWFApi();
-
-        countries.add("Malaysia");
-        countries.add("Indonesia");
-
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(PublishDocumentActivity.this, android.R.layout.simple_spinner_item, countries);
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
-        countrySpinner.setAdapter(adapter);
-
-        List<String> themes = new ArrayList<String>();
-        themes.add("Domestic Worker");
-
-        relatedThemesSpinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, themes));
-
+        relatedThemes = getResources().getStringArray(R.array.related_themes);
+        relatedThemesStr = getResources().getStringArray(R.array.related_themes_string);
         // Get intent, action and MIME type
         Intent intent = getIntent();
         String action = intent.getAction();
@@ -268,7 +320,7 @@ public class PublishDocumentActivity extends Activity {
                     try {
                         imageView.setImageBitmap(decodeUri(selectedImage));
                     } catch (FileNotFoundException e) {
-                       Log.e(Consts.LOGTAG, e.getMessage(), e);
+                        Log.e(Consts.LOGTAG, e.getMessage(), e);
                     }
                 }
                 return;

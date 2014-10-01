@@ -128,6 +128,14 @@
         </TableRow>
 
     </TableLayout>
+    <Button android:text="Select Countries"
+        android:layout_width="match_parent"
+        android:id="@+id/button_countries"
+        android:layout_height="wrap_content" />
+    <Button android:text="Select Related Themes"
+        android:layout_width="match_parent"
+        android:id="@+id/button_relatedThemes"
+        android:layout_height="wrap_content" />
 
     <Button
         android:id="@+id/button_submit"

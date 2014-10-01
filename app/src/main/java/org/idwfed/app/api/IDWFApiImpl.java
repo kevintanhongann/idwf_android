@@ -33,6 +33,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  * Created by kevintanhongann on 9/14/14.
@@ -44,18 +45,17 @@ public enum IDWFApiImpl implements IDWFApi {
     private RequestQueue rq;
 
     @Override
-    public void createWccDoc(Context context, String title, String description, String body, String country, String url, String uid, String username, String password, String imageData, String imageContentType, String imageCaption, String sourceCaption, String sourceUrl, String theme, final CreateWccDocumentCallback callback) {
+    public void createWccDoc(Context context, String title, String description, String body, List<String> countries, String url, String uid, String username, String password, String imageData, String imageContentType, String imageCaption, String sourceCaption, String sourceUrl, List<String> themes, final CreateWccDocumentCallback callback) {
         JSONObject jsonObject = new JSONObject();
         try {
-
             jsonObject.put("title", title);
             jsonObject.put("description", description);
             jsonObject.put("text", body);
             jsonObject.put("source_url", sourceUrl);
             jsonObject.put("source_caption", sourceCaption);
-            jsonObject.put("idwf_themes", theme);
+            jsonObject.put("idwf_themes", themes.toArray());
             jsonObject.put("image_caption", imageCaption);
-            jsonObject.put("related_countries", country);
+            jsonObject.put("related_countries", countries.toArray());
             JSONObject imageJsonObject = new JSONObject();
 
             imageJsonObject.put("data", imageData);

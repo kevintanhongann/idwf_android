@@ -2,6 +2,7 @@ package org.idwfed.app.api;
 
 import android.content.Context;
 import android.util.Log;
+
 import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -53,15 +54,20 @@ public enum IDWFApiImpl implements IDWFApi {
             jsonObject.put("text", body);
             jsonObject.put("source_url", sourceUrl);
             jsonObject.put("source_caption", sourceCaption);
-            jsonObject.put("idwf_themes", themes.toArray());
+            if (themes != null) {
+                jsonObject.put("idwf_themes", themes.toArray());
+            }
             jsonObject.put("image_caption", imageCaption);
-            jsonObject.put("related_countries", countries.toArray());
+            if (countries != null) {
+                jsonObject.put("related_countries", countries.toArray());
+            }
             JSONObject imageJsonObject = new JSONObject();
 
             imageJsonObject.put("data", imageData);
             imageJsonObject.put("ilename", "string");
             imageJsonObject.put("content_type", imageContentType);
             jsonObject.put("image", imageJsonObject);
+            Log.d(Consts.LOGTAG, "createWccDoc " + jsonObject);
             CreateWccDocRequest request = new CreateWccDocRequest(Request.Method.POST, url, username, password, jsonObject, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
@@ -100,7 +106,7 @@ public enum IDWFApiImpl implements IDWFApi {
     @Override
     public void getFolders(Context context, String url, final FoldersCallback callback) {
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,  null, new Response.Listener<JSONObject>() {
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 Log.d(Consts.LOGTAG,
@@ -118,11 +124,11 @@ public enum IDWFApiImpl implements IDWFApi {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                if(error instanceof TimeoutError){
+                if (error instanceof TimeoutError) {
                     callback.onFail(new FoldersException("Request timeout", error));
-                }else if(error instanceof NoConnectionError){
+                } else if (error instanceof NoConnectionError) {
                     callback.onFail(new FoldersException("No connection", error));
-                }else{
+                } else {
                     callback.onFail(new FoldersException(error.getMessage(), error));
                 }
             }
@@ -206,7 +212,6 @@ public enum IDWFApiImpl implements IDWFApi {
 
         getRequestQueue(context).add(request);
     }
-
 
 
 }

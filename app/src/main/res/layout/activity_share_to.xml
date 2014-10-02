@@ -103,7 +103,10 @@
 
     <Button
         android:id="@+id/button_submit"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
         android:text="Share Update"
+        android:background="@drawable/apptheme_btn_default_holo_light"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

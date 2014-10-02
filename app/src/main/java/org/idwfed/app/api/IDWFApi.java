@@ -8,6 +8,7 @@ import org.idwfed.app.callback.CreateWccDocumentCallback;
 import org.idwfed.app.callback.FoldersCallback;
 import org.idwfed.app.callback.LoginCallback;
 import org.idwfed.app.callback.PublicDocumentsCallback;
+import org.idwfed.app.domain.Image;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ import java.util.List;
  */
 public interface IDWFApi {
     void getFolders(Context context, String url, FoldersCallback callback);
-    void createWccDoc(Context context, String title, String description, String body, List<String> country, String url, String uid, String username, String password, String imageData, String imageContentType, String imageCaption, String sourceCaption, String sourceUrl, List<String> themes, final CreateWccDocumentCallback callback);
+    void createWccDoc(Context context, String title, String description, String body, List<String> country, String url, String uid, String username, String password, Image image, String sourceCaption, String sourceUrl, List<String> themes, final CreateWccDocumentCallback callback);
     void updateWccDoc(String documentId);
     void login(Context context, String username, String password, String url, LoginCallback callback);
     void deleteWccDoc(String documentId);

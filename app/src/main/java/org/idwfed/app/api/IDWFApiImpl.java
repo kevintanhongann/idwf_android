@@ -19,6 +19,7 @@ import org.idwfed.app.callback.CreateWccDocumentCallback;
 import org.idwfed.app.callback.FoldersCallback;
 import org.idwfed.app.callback.LoginCallback;
 import org.idwfed.app.callback.PublicDocumentsCallback;
+import org.idwfed.app.domain.Image;
 import org.idwfed.app.exception.CreateWccDocException;
 import org.idwfed.app.exception.FoldersException;
 import org.idwfed.app.exception.LoginException;
@@ -47,7 +48,7 @@ public enum IDWFApiImpl implements IDWFApi {
     private RequestQueue rq;
 
     @Override
-    public void createWccDoc(Context context, String title, String description, String body, List<String> countries, String url, String uid, String username, String password, String imageData, String imageContentType, String imageCaption, String sourceCaption, String sourceUrl, List<String> themes, final CreateWccDocumentCallback callback) {
+    public void createWccDoc(Context context, String title, String description, String body, List<String> countries, String url, String uid, String username, String password, Image image, String sourceCaption, String sourceUrl, List<String> themes, final CreateWccDocumentCallback callback) {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("title", title);
@@ -55,24 +56,26 @@ public enum IDWFApiImpl implements IDWFApi {
             jsonObject.put("text", body);
             jsonObject.put("source_url", sourceUrl);
             jsonObject.put("source_caption", sourceCaption);
-            if (themes != null) {
+            if (themes != null && !themes.isEmpty()) {
                 JSONArray themesJsonArray = new JSONArray(themes);
                 //jsonObject.put("idwf_themes", themes.toArray(new String[themes.size()]));
                 jsonObject.put("idwf_themes", themesJsonArray);
             }
-            jsonObject.put("image_caption", imageCaption);
-            if (countries != null) {
+            jsonObject.put("image_caption", image.getCaption());
+            if (countries != null && !countries.isEmpty()) {
                 JSONArray countriesJsonAry = new JSONArray(countries);
                 //jsonObject.put("related_countries", countries.toArray(new String[countries.size()]));
                 jsonObject.put("related_countries", countriesJsonAry);
             }
             JSONObject imageJsonObject = new JSONObject();
-
-            imageJsonObject.put("data", imageData);
-            imageJsonObject.put("ilename", "string");
-            imageJsonObject.put("content_type", imageContentType);
-            jsonObject.put("image", imageJsonObject);
-            Log.d(Consts.LOGTAG, "createWccDoc " + jsonObject);
+            imageJsonObject.put("data", image.getBase64Encode());
+            imageJsonObject.put("filename", "string");
+            imageJsonObject.put("content_type", image.getContentType());
+            imageJsonObject.put("size", image.getSize());
+            if (image.getBase64Encode() != null) {
+                jsonObject.put("image", imageJsonObject);
+            }
+            Log.d(Consts.LOGTAG, "createWccDoc request " + jsonObject);
             CreateWccDocRequest request = new CreateWccDocRequest(Request.Method.POST, url, username, password, jsonObject, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {

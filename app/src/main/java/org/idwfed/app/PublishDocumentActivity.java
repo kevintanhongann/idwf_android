@@ -7,52 +7,31 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.ParseException;
 import android.net.Uri;
-import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.NavUtils;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
-import android.view.ActionMode;
-import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.Toast;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
 import org.idwfed.app.api.ApiFactory;
 import org.idwfed.app.api.IDWFApi;
 import org.idwfed.app.callback.CreateWccDocumentCallback;
-import org.idwfed.app.domain.Item;
+import org.idwfed.app.domain.Image;
 import org.idwfed.app.exception.CreateWccDocException;
 import org.idwfed.app.response.CreateWccDocResponse;
 import org.idwfed.app.util.Consts;
 import org.idwfed.app.util.PrefUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -90,7 +69,7 @@ public class PublishDocumentActivity extends Activity {
     List<Integer> themesInt = new ArrayList<Integer>();
     List<Integer> countriesInt = new ArrayList<Integer>();
     private IDWFApi idwfApi;
-    private String imageDataStr;
+    private String imageData;
     private String[] relatedThemes;
     private String[] relatedThemesStr;
     private List<String> selectedCountries;
@@ -115,7 +94,7 @@ public class PublishDocumentActivity extends Activity {
                     url = PrefUtils.getServerUrl(PublishDocumentActivity.this) + getString(R.string.createdoc_path);
                 }
 
-                idwfApi.createWccDoc(getApplicationContext(), etTitleTxt.getText().toString(), etDescription.getText().toString(), etBodyTxt.getText().toString(), countries, url, "", PrefUtils.getUsername(PublishDocumentActivity.this), PrefUtils.getPassword(PublishDocumentActivity.this), imageDataStr, "image/*", "", "", "", themes, new CreateWccDocumentCallback() {
+                idwfApi.createWccDoc(getApplicationContext(), etTitleTxt.getText().toString(), etDescription.getText().toString(), etBodyTxt.getText().toString(), countries, url, "", PrefUtils.getUsername(PublishDocumentActivity.this), PrefUtils.getPassword(PublishDocumentActivity.this), new Image(imageFileSize, imageData, "image/*", ""), "", "", themes, new CreateWccDocumentCallback() {
                     @Override
                     public void onFail(CreateWccDocException ex) {
                         Toast.makeText(getApplicationContext(), ex.getMessage(), Toast.LENGTH_SHORT).show();
@@ -149,6 +128,7 @@ public class PublishDocumentActivity extends Activity {
         }
     };
     private List<String> displayCountries;
+    private int imageFileSize = 0;
 
     @OnClick(R.id.button_relatedThemes)
     void onRelatedThemesClick() {
@@ -163,9 +143,9 @@ public class PublishDocumentActivity extends Activity {
                 .setMultiChoiceItems(relatedThemesStr, booleanAry, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                        if(isChecked){
+                        if (isChecked) {
                             themesInt.add(which);
-                        }else if(themesInt.contains(which)){
+                        } else if (themesInt.contains(which)) {
                             themesInt.remove(Integer.valueOf(which));
                         }
                     }
@@ -228,7 +208,7 @@ public class PublishDocumentActivity extends Activity {
         relatedThemes = getResources().getStringArray(R.array.related_themes);
         relatedThemesStr = getResources().getStringArray(R.array.related_themes_string);
 
-         displayCountries = new ArrayList<String>();
+        displayCountries = new ArrayList<String>();
         for (String countryCode : Locale.getISOCountries()) {
             Locale obj = new Locale("", countryCode);
             displayCountries.add(obj.getDisplayCountry());
@@ -329,7 +309,8 @@ public class PublishDocumentActivity extends Activity {
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
                         byte[] b = baos.toByteArray();
-                        imageDataStr = Base64.encodeToString(b, Base64.DEFAULT);
+                        imageData = Base64.encodeToString(b, Base64.DEFAULT);
+                        imageFileSize = getByteSizeOf(bitmap);
                         try {
                             imageView.setImageBitmap(decodeUri(selectedImage));
                         } catch (FileNotFoundException e) {
@@ -345,14 +326,27 @@ public class PublishDocumentActivity extends Activity {
                 if (resultCode == RESULT_OK) {
                     Bundle extras = imageReturnedIntent.getExtras();
                     Bitmap imageBitmap = (Bitmap) extras.get("data");
-
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                     imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
                     byte[] fullBytes = byteArrayOutputStream.toByteArray();
-                    imageDataStr = Base64.encodeToString(fullBytes, Base64.DEFAULT);
+                    imageData = Base64.encodeToString(fullBytes, Base64.DEFAULT);
+                    imageFileSize = getByteSizeOf(imageBitmap);
                     imageView.setImageBitmap(imageBitmap);
                 }
                 return;
+        }
+    }
+
+    /**
+     * returns the bytesize of the give bitmap
+     */
+    public static int getByteSizeOf(Bitmap bitmap) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            return bitmap.getAllocationByteCount();
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
+            return bitmap.getByteCount();
+        } else {
+            return bitmap.getRowBytes() * bitmap.getHeight();
         }
     }
 }

@@ -65,7 +65,6 @@ public class PublishDocumentActivity extends Activity {
     @InjectView(R.id.button_submit)
     Button submitBtn;
 
-    List<String> countries = new ArrayList<String>();
     List<Integer> themesInt = new ArrayList<Integer>();
     List<Integer> countriesInt = new ArrayList<Integer>();
     private IDWFApi idwfApi;
@@ -94,7 +93,7 @@ public class PublishDocumentActivity extends Activity {
                     url = PrefUtils.getServerUrl(PublishDocumentActivity.this) + getString(R.string.createdoc_path);
                 }
 
-                idwfApi.createWccDoc(getApplicationContext(), etTitleTxt.getText().toString(), etDescription.getText().toString(), etBodyTxt.getText().toString(), countries, url, "", PrefUtils.getUsername(PublishDocumentActivity.this), PrefUtils.getPassword(PublishDocumentActivity.this), new Image(imageFileSize, imageData, "image/*", ""), "", "", themes, new CreateWccDocumentCallback() {
+                idwfApi.createWccDoc(getApplicationContext(), etTitleTxt.getText().toString(), etDescription.getText().toString(), etBodyTxt.getText().toString(), selectedCountries, url, "", PrefUtils.getUsername(PublishDocumentActivity.this), PrefUtils.getPassword(PublishDocumentActivity.this), new Image(imageFileSize, imageData, "image/*", ""), "", "", themes, new CreateWccDocumentCallback() {
                     @Override
                     public void onFail(CreateWccDocException ex) {
                         Toast.makeText(getApplicationContext(), ex.getMessage(), Toast.LENGTH_SHORT).show();
@@ -191,7 +190,8 @@ public class PublishDocumentActivity extends Activity {
                     public void onClick(DialogInterface dialog, int which) {
                         selectedCountries = new ArrayList<String>();
                         for (Integer integer : countriesInt) {
-                            selectedCountries.add(displayCountries.get(integer));
+                            //selectedCountries.add(displayCountries.get(integer));
+                            selectedCountries.add(Locale.getISOCountries()[integer]);
                         }
                     }
                 })

@@ -10,9 +10,4 @@
         android:showAsAction="ifRoom"
         android:title="@string/pick_gallery"
         android:visible="true"/>
-    <item android:id="@+id/action_send_now"
-        android:icon="@drawable/ic_action_send_now"
-        android:showAsAction="ifRoom"
-        android:title="@string/send_now"
-        android:visible="true"/>
 </menu>

@@ -247,9 +247,6 @@ public class PublishDocumentActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         switch (id) {
-            case R.id.action_send_now:
-                //doShare();
-                return true;
             case R.id.action_pick_gallery:
                 Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
                 photoPickerIntent.setType("image/*");

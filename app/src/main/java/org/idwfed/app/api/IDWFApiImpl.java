@@ -53,7 +53,7 @@ public enum IDWFApiImpl implements IDWFApi {
         try {
             jsonObject.put("title", title);
             jsonObject.put("description", description);
-            jsonObject.put("text", body);
+            jsonObject.put("body", body);
             jsonObject.put("source_url", sourceUrl);
             jsonObject.put("source_caption", sourceCaption);
             if (themes != null && !themes.isEmpty()) {

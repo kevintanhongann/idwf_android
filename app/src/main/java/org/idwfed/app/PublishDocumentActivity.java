@@ -221,9 +221,11 @@ public class PublishDocumentActivity extends Activity {
 
         if (Intent.ACTION_SEND.equals(action) && type != null) {
             if ("text/plain".equals(type)) {
+                String sharedTitle = intent.getStringExtra(Intent.EXTRA_TITLE);
                 String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
                 if (sharedText != null) {
-                    etTitleTxt.setText(sharedText);
+                    etTitleTxt.setText(sharedTitle);
+                    etBodyTxt.setText(sharedText);
                 }
             }
         }

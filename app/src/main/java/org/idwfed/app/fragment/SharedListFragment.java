@@ -68,7 +68,14 @@ public class SharedListFragment extends ProgressFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mIdwfApi.getPublicDocuments(getActivity().getApplicationContext(), new PublicDocumentsCallback() {
+
+        String url = getString(R.string.server_url) + getString(R.string.publicdocs_path);
+
+        if(!PrefUtils.getUsername(getActivity().getApplicationContext()).isEmpty()){
+            url = url + "?creator="+PrefUtils.getUsername(getActivity().getApplicationContext());
+        }
+
+        mIdwfApi.getPublicDocuments(getActivity().getApplicationContext(),url,  new PublicDocumentsCallback() {
             @Override
             public void onFail(PublicDocumentsException exception) {
                 if (getView() != null) {

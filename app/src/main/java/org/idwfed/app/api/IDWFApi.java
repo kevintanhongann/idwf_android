@@ -22,5 +22,5 @@ public interface IDWFApi {
     void login(Context context, String username, String password, String url, LoginCallback callback);
     void deleteWccDoc(String documentId);
     RequestQueue getRequestQueue(Context context);
-    void getPublicDocuments(Context context, final PublicDocumentsCallback callback);
+    void getPublicDocuments(Context context,String url, final PublicDocumentsCallback callback);
 }

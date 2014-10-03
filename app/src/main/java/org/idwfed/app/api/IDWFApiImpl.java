@@ -187,8 +187,8 @@ public enum IDWFApiImpl implements IDWFApi {
     }
 
     @Override
-    public void getPublicDocuments(Context context, final PublicDocumentsCallback callback) {
-        String url = "http://storyapi.dev.inigo-tech.com/@@API/plone/api/1.0/documents";
+    public void getPublicDocuments(Context context, String url, final PublicDocumentsCallback callback) {
+        //String url = "http://storyapi.dev.inigo-tech.com/@@API/plone/api/1.0/documents";
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override

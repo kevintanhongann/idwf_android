@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="server_url">http://storyapi.dev.inigo-tech.com</string>
+    <string name="server_url">http://idwf.dev.inigo-tech.com</string>
     <string name="server_path">/@@API/plone/api/1.0/folders?q=idwfshared</string>
     <string name="login_path">/@@API/plone/api/1.0/story</string>
     <string name="folder_path">/@@API/plone/api/1.0/folders</string>
-    <string name="createdoc_path">/@@API/plone/api/1.0/story/create/18c9fde71a414dcaac7a212041ee4fd7</string>
+    <string name="createdoc_path">/@@API/plone/api/1.0/story/create/754439833405499ba7dd2dd367c4b441</string>
     <string name="publicdocs_path">/@@API/plone/api/1.0/story</string>
 </resources>

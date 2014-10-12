@@ -19,17 +19,21 @@ import org.idwfed.app.callback.CreateWccDocumentCallback;
 import org.idwfed.app.callback.FoldersCallback;
 import org.idwfed.app.callback.LoginCallback;
 import org.idwfed.app.callback.PublicDocumentsCallback;
+import org.idwfed.app.callback.ValidatorCallback;
 import org.idwfed.app.domain.Image;
 import org.idwfed.app.exception.CreateWccDocException;
 import org.idwfed.app.exception.FoldersException;
 import org.idwfed.app.exception.LoginException;
 import org.idwfed.app.exception.PublicDocumentsException;
+import org.idwfed.app.exception.ValidatorException;
 import org.idwfed.app.request.CreateWccDocRequest;
 import org.idwfed.app.request.LoginRequest;
+import org.idwfed.app.request.PublicDocumentsRequest;
 import org.idwfed.app.response.FoldersResponse;
 import org.idwfed.app.response.LoginResponse;
 import org.idwfed.app.response.CreateWccDocResponse;
 import org.idwfed.app.response.PublicDocumentsResponse;
+import org.idwfed.app.response.ValidatorResponse;
 import org.idwfed.app.util.Consts;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -189,7 +193,7 @@ public enum IDWFApiImpl implements IDWFApi {
     @Override
     public void getPublicDocuments(Context context, String url, final PublicDocumentsCallback callback) {
         //String url = "http://storyapi.dev.inigo-tech.com/@@API/plone/api/1.0/documents";
-
+        Log.d(Consts.LOGTAG, "getPublicDocuments url "+url);
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -214,6 +218,72 @@ public enum IDWFApiImpl implements IDWFApi {
                     callback.onFail(new PublicDocumentsException("No connection", error));
                 } else {
                     callback.onFail(new PublicDocumentsException(error.getMessage(), error));
+                }
+            }
+        });
+
+        getRequestQueue(context).add(request);
+    }
+
+    @Override
+    public void getPublicDocumentsWithAuth(Context context, String url, String username, String password, final PublicDocumentsCallback callback) {
+        PublicDocumentsRequest request = new PublicDocumentsRequest(Request.Method.GET, url, username, password, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.d(Consts.LOGTAG,
+                        "getPublicDocuments response " + response.toString());
+                //parse response object to json
+                Type type = new TypeToken<PublicDocumentsResponse>() {
+                }.getType();
+                Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZ").serializeNulls().create();
+                PublicDocumentsResponse publicDocumentsResponse = gson
+                        .fromJson(response.toString(), type);
+                Log.d(Consts.LOGTAG,
+                        "publicDocumentsResponse " + publicDocumentsResponse);
+                callback.onSuccess(publicDocumentsResponse);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if (error instanceof TimeoutError) {
+                    callback.onFail(new PublicDocumentsException("Request timeout", error));
+                } else if (error instanceof NoConnectionError) {
+                    callback.onFail(new PublicDocumentsException("No connection", error));
+                } else {
+                    callback.onFail(new PublicDocumentsException(error.getMessage(), error));
+                }
+            }
+        });
+        getRequestQueue(context).add(request);
+    }
+
+    @Override
+    public void validateLogin(Context context, String url, final ValidatorCallback callback) {
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(), new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.d(Consts.LOGTAG,
+                        "validateLogin response " + response.toString());
+                //parse response object to json
+                Type type = new TypeToken<ValidatorResponse>() {
+                }.getType();
+                Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZ").serializeNulls().create();
+                ValidatorResponse validatorResponse = gson
+                        .fromJson(response.toString(), type);
+                Log.d(Consts.LOGTAG,
+                        "validatorResponse " + validatorResponse);
+                callback.onSuccess(validatorResponse);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if(error instanceof TimeoutError){
+                    callback.onFail(new ValidatorException("Request timeout", error));
+                }else if(error instanceof NoConnectionError){
+                    callback.onFail(new ValidatorException("No internet connection", error));
+                }else{
+                    callback.onFail(new ValidatorException(error.getMessage(), error));
                 }
             }
         });

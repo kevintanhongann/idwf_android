@@ -8,6 +8,7 @@ import org.idwfed.app.callback.CreateWccDocumentCallback;
 import org.idwfed.app.callback.FoldersCallback;
 import org.idwfed.app.callback.LoginCallback;
 import org.idwfed.app.callback.PublicDocumentsCallback;
+import org.idwfed.app.callback.ValidatorCallback;
 import org.idwfed.app.domain.Image;
 
 import java.util.List;
@@ -23,4 +24,6 @@ public interface IDWFApi {
     void deleteWccDoc(String documentId);
     RequestQueue getRequestQueue(Context context);
     void getPublicDocuments(Context context,String url, final PublicDocumentsCallback callback);
+    void getPublicDocumentsWithAuth(Context context, String url, String username, String password, final PublicDocumentsCallback callback);
+    void validateLogin(Context context, String url, final ValidatorCallback callback);
 }

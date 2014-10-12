@@ -18,8 +18,11 @@ import android.widget.Toast;
 import org.idwfed.app.api.ApiFactory;
 import org.idwfed.app.api.IDWFApi;
 import org.idwfed.app.callback.LoginCallback;
+import org.idwfed.app.callback.ValidatorCallback;
 import org.idwfed.app.exception.LoginException;
+import org.idwfed.app.exception.ValidatorException;
 import org.idwfed.app.response.LoginResponse;
+import org.idwfed.app.response.ValidatorResponse;
 import org.idwfed.app.util.Consts;
 import org.idwfed.app.util.LoginSuccessEvent;
 import org.idwfed.app.util.PrefUtils;
@@ -78,18 +81,32 @@ public class LoginActivity extends Activity {
                             }
                         }
                         @Override
-                        public void onSuccess(LoginResponse response) {
-                            if (!response.getItems().isEmpty()) {
+                        public void onSuccess(final LoginResponse loginResponse) {
+                            if (!loginResponse.getItems().isEmpty()) {
 
-                                EventBus.getDefault().postSticky(new LoginSuccessEvent(response.getItems()));
-                                PrefUtils.setUsername(LoginActivity.this, etUsername.getText().toString());
-                                //FIXME store password in char array
-                                PrefUtils.setPassword(LoginActivity.this, etPassword.getText().toString());
-                                PrefUtils.setUserDocs(LoginActivity.this, response.getItems());
-                                finish();
-                                NavUtils.navigateUpTo(LoginActivity.this, new Intent(LoginActivity.this, SharedListActivity.class));
+                                String validatorUrl = getString(R.string.server_url) + getString(R.string.login_validator_path);
+                                idwfApi.validateLogin(LoginActivity.this, validatorUrl, new ValidatorCallback() {
+                                    @Override
+                                    public void onFail(ValidatorException ex) {
+                                        Toast.makeText(LoginActivity.this, ex.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    @Override
+                                    public void onSuccess(ValidatorResponse response) {
+                                        for (ValidatorResponse.User user : response.getUsers()) {
+                                            /*if(!user.getUsername().contains("Anonymous User")){
+
+                                            }*/
+                                            EventBus.getDefault().postSticky(new LoginSuccessEvent(loginResponse.getItems()));
+                                            PrefUtils.setUsername(LoginActivity.this, etUsername.getText().toString());
+                                            PrefUtils.setPassword(LoginActivity.this, etPassword.getText().toString());
+                                            PrefUtils.setUserDocs(LoginActivity.this, loginResponse.getItems());
+                                            finish();
+                                            NavUtils.navigateUpTo(LoginActivity.this, new Intent(LoginActivity.this, SharedListActivity.class));
+                                        }
+                                    }
+                                });
                             }
-
                             if(progressDialog.isShowing()){
                                 progressDialog.dismiss();
                             }

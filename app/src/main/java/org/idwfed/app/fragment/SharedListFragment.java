@@ -73,30 +73,51 @@ public class SharedListFragment extends ProgressFragment {
 
         if(!PrefUtils.getUsername(getActivity().getApplicationContext()).isEmpty()){
             url = url + "?creator="+PrefUtils.getUsername(getActivity().getApplicationContext());
+            mIdwfApi.getPublicDocumentsWithAuth(getActivity(), url, PrefUtils.getUsername(getActivity()), PrefUtils.getPassword(getActivity()), new PublicDocumentsCallback() {
+                @Override
+                public void onFail(PublicDocumentsException exception) {
+                    if (getView() != null) {
+                        Toast.makeText(getActivity(), exception.getMessage(), Toast.LENGTH_SHORT).show();
+                        setContentShown(true);
+                    }
+                }
+
+                @Override
+                public void onSuccess(PublicDocumentsResponse response) {
+                    setViews(response);
+                }
+            });
+
+        }else{
+            mIdwfApi.getPublicDocuments(getActivity().getApplicationContext(),url,  new PublicDocumentsCallback() {
+                @Override
+                public void onFail(PublicDocumentsException exception) {
+                    if (getView() != null) {
+                        Toast.makeText(getActivity(), exception.getMessage(), Toast.LENGTH_SHORT).show();
+                        setContentShown(true);
+                    }
+                }
+
+                @Override
+                public void onSuccess(PublicDocumentsResponse response) {
+                    setViews(response);
+                }
+            });
         }
 
-        mIdwfApi.getPublicDocuments(getActivity().getApplicationContext(),url,  new PublicDocumentsCallback() {
-            @Override
-            public void onFail(PublicDocumentsException exception) {
-                if (getView() != null) {
-                    Toast.makeText(getActivity(), exception.getMessage(), Toast.LENGTH_SHORT).show();
-                    setContentShown(true);
-                }
-            }
 
-            @Override
-            public void onSuccess(PublicDocumentsResponse response) {
-                if (response != null && getView() != null) {
-                    ItemsAdapter itemsAdapter = new ItemsAdapter(getActivity().getApplicationContext(), R.layout.layout_doc_row, response.getItems());
-                    if (PrefUtils.getUserDocs(getActivity()) != null) {
-                        itemsAdapter.addAll(PrefUtils.getUserDocs(getActivity()));
-                    }
-                    docsListView.setAdapter(itemsAdapter);
-                    setContentShown(true);
-                    docsListView.setOnItemClickListener(onItemClick);
-                }
+    }
+
+    private void setViews(PublicDocumentsResponse response) {
+        if (response != null && getView() != null) {
+            ItemsAdapter itemsAdapter = new ItemsAdapter(getActivity().getApplicationContext(), R.layout.layout_doc_row, response.getItems());
+            if (PrefUtils.getUserDocs(getActivity()) != null) {
+                itemsAdapter.addAll(PrefUtils.getUserDocs(getActivity()));
             }
-        });
+            docsListView.setAdapter(itemsAdapter);
+            setContentShown(true);
+            docsListView.setOnItemClickListener(onItemClick);
+        }
     }
 
     class ItemsAdapter extends ArrayAdapter<Item> {

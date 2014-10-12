@@ -6,4 +6,5 @@
     <string name="folder_path">/@@API/plone/api/1.0/folders</string>
     <string name="createdoc_path">/@@API/plone/api/1.0/story/create/754439833405499ba7dd2dd367c4b441</string>
     <string name="publicdocs_path">/@@API/plone/api/1.0/story</string>
+    <string name="login_validator_path">/@@API/plone/api/1.0/users/current</string>
 </resources>
